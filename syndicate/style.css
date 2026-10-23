@@ -1,0 +1,90 @@
+/* Aspetto provvisorio: lo stile comune a tutti i giochi arriverà dopo. */
+:root {
+  --sfondo: #1f2a24; --pannello: #2b3a32; --testo: #f3efe4; --tenue: #aab8ae;
+  --carta: #fbf8ef; --nero: #1c1c1c; --rosso: #c0392b; --evid: #e6b84a; --ok: #6bbf8a; --no: #e0675a; --sost: #5fb0e6;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--sfondo); color: var(--testo);
+  font: 17px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+#app { max-width: 600px; margin: 0 auto; padding: 10px 10px 8px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { opacity: .45; cursor: default; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 6px 8px; flex-wrap: wrap; }
+.top .dx { display: flex; gap: 6px; }
+h1 { margin: 0; font-size: 1.15rem; }
+h2 { margin: 6px 0; font-size: 1.2rem; }
+.mini { background: transparent; border: 1px solid var(--tenue); color: var(--tenue);
+  border-radius: 8px; padding: 6px 9px; font-size: .85rem; white-space: nowrap; min-height: 44px; }
+.punti { display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 6px; color: var(--tenue); font-size: .85rem; }
+.etichetta { margin: 10px 0 4px; color: var(--tenue); font-size: .85rem; }
+
+/* carte: strisce da toccare, valore e seme sulla stessa riga */
+.carta { display: flex; justify-content: center; align-items: center; gap: 1px; width: 100%; height: 40px; min-width: 0;
+  background: var(--carta); color: var(--nero); border: 3px solid transparent; border-radius: 7px;
+  padding: 0; line-height: 1; font-weight: 700; font-size: 1.2rem; }
+.carta.R { color: var(--rosso); }
+.carta.scelta { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
+.carta.sost { border-color: var(--sost); box-shadow: 0 0 0 2px var(--sost); }
+.carta.sacr { border-color: var(--no); box-shadow: 0 0 0 2px var(--no); border-style: dashed; }
+.carta.no { border-color: var(--no); box-shadow: 0 0 0 2px var(--no); }
+.carta.suggerita, .suggerita { border-color: var(--evid); animation: pulsa 1.2s ease-in-out infinite; }
+div.carta { cursor: default; }
+.istruzione { display: block; margin-bottom: 6px; color: var(--evid); }
+@keyframes pulsa { 50% { box-shadow: 0 0 0 4px var(--evid); } }
+@media (prefers-reduced-motion: reduce) { .suggerita { animation: none !important; box-shadow: 0 0 0 2px var(--evid); } }
+
+/* i cinque gradi, da 5 (a sinistra) a 1 */
+.gradi { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.grado { min-width: 0; }
+.gtit { text-align: center; font-weight: 700; font-size: .78rem; margin-bottom: 3px; }
+.zona { display: flex; flex-direction: column; gap: 3px; padding: 3px; border-radius: 9px; min-width: 0; }
+.zona small { display: block; text-align: center; color: var(--tenue); font-size: .62rem; line-height: 1.1; }
+.zona.membri { background: var(--pannello); border: 1px solid #4b5f53; margin-bottom: 5px; min-height: 148px; }
+.zona.cand { background: #19221d; min-height: 44px; }
+.vuoto { height: 40px; border: 2px dashed #3d5046; border-radius: 7px; }
+
+.msg { min-height: 2.8em; margin: 8px 0 2px; color: var(--evid); font-size: .98rem; }
+.msg.ok { color: var(--ok); }
+.piano { background: var(--pannello); border-radius: 10px; padding: 8px 10px; margin-top: 8px; font-size: .95rem; }
+.piano div { display: flex; justify-content: space-between; gap: 8px; }
+.piano .manca { color: var(--tenue); }
+.piano b { font-weight: 700; }
+
+.due { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+.quattro { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.resto { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.resto .carta { height: 46px; }
+.due button, .azioni button, .grande { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 52px; padding: 2px 6px; font-weight: 600; line-height: 1.15; }
+.due button.scelta { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); background: #3a4a3c; }
+.azioni { display: flex; gap: 6px; margin-top: 8px; }
+.azioni button { flex: 1; }
+.azioni .conferma, .grande.primo { background: #2f6b46; border-color: var(--ok); }
+.azioni button.suggerita, .due button.suggerita { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
+.quieto { display: block; width: 100%; margin-top: 14px; background: transparent; border: 1px solid #4b5f53; border-radius: 10px;
+  min-height: 48px; color: var(--tenue); font-size: .92rem; }
+
+.pannello { background: var(--pannello); border-radius: 12px; padding: 14px; margin-top: 10px; }
+.pannello p { margin: 6px 0 12px; }
+.grande { width: 100%; min-height: 54px; margin-top: 8px; font-size: 1.05rem; }
+.passo { background: var(--pannello); border-radius: 10px; padding: 10px 12px; margin-top: 8px; font-size: .95rem; }
+.istr { position: sticky; top: 0; z-index: 5; background: var(--sfondo); padding: 6px 2px; border-bottom: 1px solid #4b5f53; margin-top: 6px; }
+.istr .istruzione { margin: 0; }
+.fine { text-align: center; }
+.fine .punteggio { font-size: 2rem; font-weight: 700; margin: 2px 0 0; }
+.fine .dettaglio { color: var(--tenue); font-size: .9rem; margin: 4px 0 12px; }
+
+.crediti { max-width: 600px; margin: 0 auto; padding: 8px 12px 18px; color: var(--tenue); font-size: .82rem; text-align: center; }
+.crediti a { color: var(--tenue); }
+.crediti p { margin: 4px 0; }
+
+@media (min-width: 700px) {
+  body { font-size: 18px; }
+  #app { padding-top: 24px; }
+  .carta { height: 44px; font-size: 1.3rem; }
+  .vuoto { height: 44px; }
+  .zona.membri { min-height: 160px; }
+  .resto .carta { height: 52px; }
+}
