@@ -1,0 +1,105 @@
+/* Aspetto provvisorio: lo stile comune a tutti i giochi arriverà dopo. */
+:root {
+  --sfondo: #1f2a24; --pannello: #2b3a32; --testo: #f3efe4; --tenue: #aab8ae;
+  --carta: #fbf8ef; --nero: #1c1c1c; --rosso: #c0392b; --evid: #e6b84a; --ok: #6bbf8a; --no: #e0594a;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--sfondo); color: var(--testo);
+  font: 17px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+#app { max-width: 480px; margin: 0 auto; padding: 10px 8px 8px; }
+button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+button:disabled { opacity: .45; cursor: default; }
+
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; }
+h1 { margin: 0; font-size: 1.1rem; white-space: nowrap; }
+h2 { margin: 6px 0; font-size: 1.2rem; }
+.mini { background: transparent; border: 1px solid var(--tenue); color: var(--tenue);
+  border-radius: 8px; padding: 6px 8px; font-size: .8rem; white-space: nowrap; min-height: 40px; }
+
+/* la barra: segnalini dei giri, mazzo, scarti */
+.barra { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 2px 2px; color: var(--tenue); font-size: .8rem; }
+.giri { display: flex; align-items: center; gap: 4px; }
+.giri .testo { margin-left: 4px; color: var(--testo); font-size: .9rem; }
+.segnalino { width: 26px; height: 36px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  line-height: 1; font-weight: 700; font-size: .78rem; }
+.segnalino.su { background: var(--carta); color: var(--nero); }
+.segnalino.su.H, .segnalino.su.D { color: var(--rosso); }
+.segnalino.giu { background-color: #3c68ad; border: 2px solid #d6e4f7;
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 3px, transparent 3px 7px),
+                    repeating-linear-gradient(-45deg, rgba(255,255,255,.18) 0 3px, transparent 3px 7px); }
+.mucchi { display: flex; gap: 10px; }
+.mucchio { display: flex; align-items: center; gap: 4px; }
+.mucchio .icona { position: relative; width: 22px; height: 30px; border-radius: 4px; }
+.mucchio .icona.mazzo { background-color: #3c68ad; border: 2px solid #d6e4f7; }
+.mucchio .icona.scarti { border: 2px dashed #7d9184; }
+.mucchio b { color: var(--testo); font-size: 1rem; min-width: 1.3em; }
+
+/* le zone: mercato e griglia sono tre colonne di caselle uguali */
+.etichetta { margin: 10px 2px 3px; color: var(--tenue); font-size: .8rem; }
+.zona { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.griglia { margin-top: 4px; }
+
+/* il ventaglio: le carte stanno una sopra l'altra, spostate a destra, in modo che si legga ogni valore e ogni seme */
+.ventaglio { position: relative; display: block; width: 100%; aspect-ratio: 115 / 86; padding: 0; border-radius: 8px;
+  border: 2px dashed #5d7366; background: transparent; container-type: inline-size; }
+.ventaglio.pieno { border-color: transparent; background: rgba(255,255,255,.06); }
+.ventaglio .carta { position: absolute; top: 0; bottom: 0; width: 52%; background: var(--carta); color: var(--nero);
+  border-radius: 7px; border: 1px solid #b9b5a8; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
+  padding: 2px 0 0 3px; line-height: 1.02; font-weight: 700; text-align: left; box-shadow: -1px 0 2px rgba(0,0,0,.25); }
+.ventaglio .carta.H, .ventaglio .carta.D { color: var(--rosso); }
+.ventaglio .carta.i0 { left: 0; } .ventaglio .carta.i1 { left: 24%; } .ventaglio .carta.i2 { left: 48%; }
+.ventaglio .carta .v { font-size: 1.05rem; font-size: 12.5cqw; }
+.ventaglio .carta .s { font-size: 1.05rem; font-size: 12.5cqw; }
+.ventaglio .carta.cima { align-items: center; justify-content: center; padding: 0; }
+.ventaglio .carta.cima .v { font-size: 1.6rem; font-size: 21cqw; }
+.ventaglio .carta.cima .s { font-size: 1.7rem; font-size: 23cqw; }
+.ventaglio .carta.evid { outline: 3px solid var(--evid); outline-offset: -3px; background: #fff3cf; }
+.ventaglio .carta.evid.cima { outline-offset: -3px; }
+.ventaglio.vuotoMercato { border-style: dotted; opacity: .5; }
+.ventaglio.scelta { box-shadow: 0 0 0 3px var(--evid); }
+.ventaglio.ultima { box-shadow: 0 0 0 3px var(--ok); }
+.ventaglio.suggerita { box-shadow: 0 0 0 3px var(--evid); animation: pulsa 1.2s ease-in-out infinite; }
+@keyframes pulsa { 50% { box-shadow: 0 0 0 6px var(--evid); } }
+@media (prefers-reduced-motion: reduce) { .ventaglio.suggerita { animation: none; } }
+
+.msg { min-height: 3.4em; margin: 8px 2px 0; color: var(--evid); font-size: .95rem; display: flex; align-items: center; }
+.msg.ok { color: var(--ok); }
+
+.azioni { display: flex; gap: 6px; margin-top: 4px; padding: 6px 0 4px; }
+.azioni.fissa { position: sticky; bottom: 0; background: var(--sfondo); }
+.azioni button, .grande { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 52px; padding: 2px 4px; font-weight: 600; flex: 1; }
+.azioni .conferma, .grande.primo { background: #2f6b46; border-color: var(--ok); }
+.azioni .suggerita { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
+
+.pannello { background: var(--pannello); border-radius: 12px; padding: 14px; margin-top: 10px; }
+.pannello p { margin: 6px 0 12px; }
+.grande { width: 100%; min-height: 54px; margin-top: 8px; font-size: 1.05rem; }
+.passo { background: var(--pannello); border-radius: 10px; padding: 10px 12px; margin-top: 8px; min-height: 7em; font-size: .93rem; }
+.istruzione { display: block; margin-bottom: 6px; color: var(--evid); }
+.fine { text-align: center; }
+.dueBottoni { display: flex; gap: 8px; }
+.demoInfo { display: flex; justify-content: space-between; margin: 8px 2px 0; color: var(--tenue); font-size: .85rem; }
+
+/* il conteggio finale: una riga per seme */
+.righe { margin: 8px 0 10px; display: grid; gap: 6px; }
+.riga { display: grid; grid-template-columns: 2.2rem 1fr auto; align-items: center; gap: 6px; text-align: left;
+  background: #34463c; border: 2px solid #4b5f53; border-radius: 10px; padding: 6px 8px; min-height: 48px; }
+.riga[aria-pressed="true"] { border-color: var(--evid); }
+.riga .sg { font-size: 1.6rem; text-align: center; line-height: 1; }
+.riga.H .sg, .riga.D .sg { color: #ff7d6e; }
+.riga .nome { font-size: .8rem; color: var(--tenue); display: block; }
+.riga .val { font-size: 1rem; font-weight: 700; letter-spacing: .02em; }
+.riga .n { font-size: 1.4rem; font-weight: 700; }
+.riga.ok .n { color: var(--ok); }
+.riga.poco .n { color: var(--no); }
+.punteggio { font-size: 1.15rem; margin: 4px 0 10px; }
+
+.crediti { max-width: 480px; margin: 0 auto; padding: 8px 12px 18px; color: var(--tenue); font-size: .82rem; text-align: center; }
+.crediti a { color: var(--tenue); }
+
+@media (min-width: 700px) {
+  body { font-size: 18px; }
+  #app { padding-top: 20px; }
+}

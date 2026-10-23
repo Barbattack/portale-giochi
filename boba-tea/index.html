@@ -4,15 +4,29 @@
   <meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The First Boba Tea Shop in London</title>
-<meta name="description" content="The First Boba Tea Shop in London: un solitario di carte. Dirigi una coda di clienti spazientiti, e spera che il mazzo finisca prima della tua pazienza. Di Wil Su, dalla collezione Isaludo.">
-<link rel="stylesheet" href="style.css">
+<title>The First Boba Tea Shop in London — prototipo (Chiara, 23/10/2026)</title>
+<!-- Prototipo di disegno: legge in sola lettura engine.js, demo.js e app.js del gioco vero (tre cartelle sopra).
+     comune.css (quello che si usa, uguale per tutti i giochi) + boba.css (la tazza, i colori, il titolo, il tutorial, le regolette).
+     copione.js è IL FILE DEI TESTI (Penna lo riscrive); spazi.js (solo prototipo) mette sul tavolo lo spazio dei posti, i costi e i messaggi coi
+     numeri; tutorial.js (solo prototipo) legge il copione e fa la partita guidata; pezzi.js, copertina.js e vignette.js sono i pezzi comuni. -->
+<link rel="stylesheet" href="../comune/comune.css">
+<link rel="stylesheet" href="boba.css">
 </head>
 <body>
 <main id="app" aria-live="polite"></main>
 <footer class="crediti" id="crediti"></footer>
+<script>
+window.CopertinaRiga = 'Londra, 2050. Hai aperto il primo chiosco di bubble tea della città, e la novità piace così tanto che davanti al bancone si formano quattro code. Gli inglesi adorano le code, ma qualcuno prova lo stesso a saltare la fila.';
+window.VignetteTrovaEscludi = '.carta, .testa, .slot';   /* nel turno «trova» la vignetta non indica né la coda né il posto */
+</script>
 <script src="engine.js"></script>
 <script src="demo.js"></script>
+<script src="copione.js"></script>
+<script src="../comune/pezzi.js"></script>
+<script src="spazi.js"></script>
+<script src="tutorial.js"></script>
+<script src="../comune/copertina.js"></script>
 <script src="app.js"></script>
+<script src="../comune/vignette.js"></script>
 </body>
 </html>

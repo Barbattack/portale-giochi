@@ -1,0 +1,76 @@
+/* Aspetto provvisorio: lo stile comune a tutti i giochi arriverà dopo. */
+:root {
+  --sfondo: #1f2a24; --pannello: #2b3a32; --testo: #f3efe4; --tenue: #aab8ae;
+  --carta: #fbf8ef; --nero: #1c1c1c; --evid: #e6b84a; --ok: #6bbf8a; --no: #c0392b;
+  --R: #d64545; --B: #3f7fd6; --V: #3fa65a; --G: #e0b21f; --P: #8a56c9;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--sfondo); color: var(--testo);
+  font: 17px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+#app { max-width: 520px; margin: 0 auto; padding: 10px 12px 8px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { opacity: .45; cursor: default; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+h1 { margin: 0; font-size: 1.15rem; white-space: nowrap; }
+h2 { margin: 6px 0; font-size: 1.2rem; }
+.mini { background: transparent; border: 1px solid var(--tenue); color: var(--tenue);
+  border-radius: 8px; padding: 4px 8px; font-size: .8rem; white-space: nowrap; }
+.punti { display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 6px; color: var(--tenue); font-size: .85rem; }
+.punti b { color: var(--testo); font-size: 1.4rem; }
+.punti .tot { text-align: center; }
+.etichetta { margin: 6px 0 4px; color: var(--tenue); font-size: .85rem; }
+
+.carta { position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  background: var(--carta); color: var(--nero); border: 3px solid transparent; border-radius: 9px;
+  border-bottom: 8px solid var(--c, #999); padding: 2px; line-height: 1; font-weight: 700; }
+.carta .v { font-size: 1.5rem; }
+.carta.R { --c: var(--R); } .carta.B { --c: var(--B); } .carta.V { --c: var(--V); }
+.carta.G { --c: var(--G); } .carta.P { --c: var(--P); }
+.carta.scelta { border-color: var(--evid); border-bottom-color: var(--c); box-shadow: 0 0 0 2px var(--evid); }
+.carta.tolta { border-color: var(--ok); border-bottom-color: var(--c); box-shadow: 0 0 0 2px var(--ok); }
+.carta.suggerita { border-color: var(--evid); border-bottom-color: var(--c); animation: pulsa 1.2s ease-in-out infinite; }
+.mosse button.suggerita, .azioni .suggerita { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
+.istruzione { display: block; margin-bottom: 6px; color: var(--evid); }
+@keyframes pulsa { 50% { box-shadow: 0 0 0 4px var(--evid); } }
+@media (prefers-reduced-motion: reduce) { .carta.suggerita { animation: none; box-shadow: 0 0 0 2px var(--evid); } }
+.carta.no { border-color: var(--no); border-bottom-color: var(--c); box-shadow: 0 0 0 2px var(--no); }
+
+.tavolo { display: flex; gap: 10px; align-items: flex-start; }
+.lupo { flex: 1; display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start; min-height: 64px; }
+.lupo .carta { width: 40px; height: 56px; }
+.lupo .carta .v { font-size: 1.25rem; }
+.lupo .vuoto { color: var(--tenue); font-size: .9rem; align-self: center; }
+.mazzo { width: 70px; text-align: center; font-size: .78rem; color: var(--tenue); }
+.mazzo .carta { width: 52px; height: 70px; margin: 0 auto 3px; }
+.mazzo .carta .v { font-size: 1.6rem; }
+.mazzo .vuoto { height: 70px; }
+
+.msg { min-height: 2.8em; margin: 8px 0 2px; color: var(--evid); font-size: .98rem; }
+.msg.ok { color: var(--ok); }
+.mano { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; min-height: 80px; }
+.mano .carta { height: 80px; }
+.mano .carta .v { font-size: 1.9rem; }
+.mosse { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 8px; }
+.mosse button { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 46px; padding: 2px 0; font-weight: 600; font-size: .82rem; line-height: 1.1; }
+.mosse button.on { border-color: var(--evid); background: #3d4a36; }
+.azioni { display: flex; gap: 6px; margin-top: 8px; }
+.azioni button, .grande { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 48px; padding: 2px 4px; font-weight: 600; flex: 1; }
+.azioni .conferma, .grande.primo { background: #2f6b46; border-color: var(--ok); }
+
+.pannello { background: var(--pannello); border-radius: 12px; padding: 14px; margin-top: 10px; }
+.pannello p { margin: 6px 0 12px; }
+.grande { width: 100%; min-height: 54px; margin-top: 8px; font-size: 1.05rem; }
+.passo { background: var(--pannello); border-radius: 10px; padding: 10px 12px; margin-top: 8px; min-height: 7em; }
+.fine { text-align: center; }
+
+.crediti { max-width: 520px; margin: 0 auto; padding: 8px 12px 18px; color: var(--tenue); font-size: .82rem; text-align: center; }
+.crediti a { color: var(--tenue); }
+
+@media (min-width: 700px) {
+  body { font-size: 18px; }
+  #app { padding-top: 24px; }
+}

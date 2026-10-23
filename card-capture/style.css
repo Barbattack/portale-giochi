@@ -1,0 +1,117 @@
+/* Aspetto provvisorio: lo stile comune a tutti i giochi arriverà dopo. */
+:root {
+  --sfondo: #1f2a24; --pannello: #2b3a32; --testo: #f3efe4; --tenue: #aab8ae;
+  --carta: #fbf8ef; --nero: #1c1c1c; --rosso: #c0392b; --evid: #e6b84a; --ok: #6bbf8a; --no: #c0392b;
+  --dorso: #3c5a8a;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--sfondo); color: var(--testo);
+  font: 17px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+#app { max-width: 520px; margin: 0 auto; padding: 10px 12px 8px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { opacity: .45; cursor: default; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+h1 { margin: 0; font-size: 1.15rem; white-space: nowrap; }
+h2 { margin: 6px 0; font-size: 1.2rem; }
+.mini { background: transparent; border: 1px solid var(--tenue); color: var(--tenue);
+  border-radius: 8px; padding: 4px 8px; font-size: .8rem; white-space: nowrap; }
+.fase { margin: 8px 0 4px; }
+.fase b { display: block; font-size: 1.02rem; }
+.fase span { display: block; color: var(--tenue); font-size: .82rem; line-height: 1.25; }
+.etichetta { margin: 6px 0 3px; color: var(--tenue); font-size: .82rem; }
+
+/* carte */
+.carta { position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  background: var(--carta); color: var(--nero); border: 3px solid transparent; border-radius: 8px;
+  padding: 2px; line-height: 1; font-weight: 700; width: 100%; }
+.carta .v { font-size: 1.35rem; }
+.carta .s { font-size: 1.35rem; }
+.carta.rosso { color: var(--rosso); }
+.carta.jolly { color: #6a3fa0; }
+.carta.jolly .v { font-size: .78rem; letter-spacing: .02em; }
+.carta.dorso { background: repeating-linear-gradient(45deg, var(--dorso) 0 6px, #34507a 6px 12px); color: #fff; border-color: #dfe7f3; }
+.carta.dorso .v { font-size: 1.3rem; text-shadow: 0 0 3px #000; }
+.carta.vuota { background: transparent; border: 2px dashed #4b5f53; }
+.carta.scelta { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
+.carta.tolta { border-color: var(--ok); box-shadow: 0 0 0 2px var(--ok); }
+.carta.no { border-color: var(--no); box-shadow: 0 0 0 2px var(--no); }
+/* solo nella demo: l'aiuto visivo su cosa toccare */
+.carta.guida, .azioni3 button.guida, .azioni .guida { outline: 3px dashed #fff; outline-offset: 2px; animation: pulsa 1.2s ease-in-out infinite; }
+@keyframes pulsa { 50% { outline-color: var(--evid); } }
+@media (prefers-reduced-motion: reduce) { .carta.guida, .azioni3 button.guida, .azioni .guida { animation: none; } }
+.passo p { margin: 0 0 6px; }
+.passo p.tocca { font-weight: 700; color: var(--evid); margin: 8px 0 0; }
+button.carta { appearance: none; -webkit-appearance: none; }
+
+/* il nemico: mazzo, posizioni 4 3 2 1, pila */
+.fila { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; align-items: start; }
+.col { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.col .carta { height: 74px; }
+.col .nome { margin-top: 2px; font-size: .68rem; color: var(--tenue); text-align: center; white-space: nowrap; }
+.supporto { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: .82rem; color: var(--tenue); }
+.supporto .carta { width: 38px; height: 52px; }
+.supporto .carta .v, .supporto .carta .s { font-size: 1rem; }
+.supporto b { color: var(--testo); }
+
+.msg { min-height: 3.9em; margin: 8px 0 2px; color: var(--evid); font-size: .94rem; line-height: 1.3; }
+.msg.ok { color: var(--ok); }
+
+/* le tue carte */
+.mano { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; min-height: 84px; }
+.mano .carta { height: 84px; }
+.mano .carta .v, .mano .carta .s { font-size: 1.7rem; }
+.mano .carta.jolly .v { font-size: .85rem; }
+.miei { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.miei .col { width: 54px; }
+.miei .col .carta { height: 54px; }
+.miei .mini { margin-left: auto; }
+.scarti-vista { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.scarti-vista .carta { width: 38px; height: 52px; }
+.scarti-vista .carta .v, .scarti-vista .carta .s { font-size: 1rem; }
+
+/* comandi */
+.azioni3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.azioni3 button, .scelte button, .azioni button, .grande, .seg button {
+  background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 48px; padding: 2px 4px; font-weight: 600; line-height: 1.1; }
+.azioni3 button small { display: block; font-weight: 400; font-size: .72rem; color: var(--tenue); margin-top: 2px; }
+.azioni3 button.on, .scelte button.on, .seg button.on { border-color: var(--evid); background: #3d4a36; }
+.scelte { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+.scelte button { min-height: 40px; font-size: .85rem; }
+.azioni { display: flex; gap: 6px; margin-top: 8px; }
+.azioni button { flex: 1; }
+.azioni .conferma, .grande.primo { background: #2f6b46; border-color: var(--ok); }
+.nemico-scelta { margin-top: 6px; }
+.nemico-scelta .cs { display: flex; flex-wrap: wrap; gap: 6px; }
+.nemico-scelta .carta { width: 44px; height: 58px; }
+.nemico-scelta .carta .v, .nemico-scelta .carta .s { font-size: 1.15rem; }
+
+.pannello { background: var(--pannello); border-radius: 12px; padding: 14px; margin-top: 10px; }
+.pannello p { margin: 6px 0 12px; }
+.grande { width: 100%; min-height: 54px; margin-top: 8px; font-size: 1.05rem; }
+.passo { background: var(--pannello); border-radius: 10px; padding: 10px 12px; margin-top: 8px; min-height: 8.5em; }
+.fine { text-align: center; }
+
+/* opzioni */
+.opz { margin: 10px 0; }
+.opz .nome { display: flex; justify-content: space-between; align-items: baseline; font-weight: 700; }
+.opz .nome .sy { font-size: 1.3rem; }
+.opz .nome .sy.rosso { color: #ff7b6b; }
+.opz .spiega { color: var(--tenue); font-size: .8rem; margin: 3px 0 0; min-height: 2.4em; line-height: 1.25; }
+.seg { display: grid; gap: 6px; margin-top: 4px; }
+.seg.due { grid-template-columns: 1fr 1fr; }
+.seg.tre { grid-template-columns: repeat(3, 1fr); }
+.seg button { min-height: 42px; font-size: .9rem; }
+.nota { color: var(--tenue); font-size: .8rem; margin: 2px 0 0; line-height: 1.25; }
+
+.crediti { max-width: 520px; margin: 0 auto; padding: 8px 12px 18px; color: var(--tenue); font-size: .82rem; text-align: center; }
+.crediti p { margin: 2px 0; }
+.crediti a { color: var(--tenue); }
+
+@media (min-width: 700px) {
+  body { font-size: 18px; }
+  #app { padding-top: 24px; }
+  .col .carta { height: 84px; }
+}

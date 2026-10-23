@@ -1,0 +1,77 @@
+/* Aspetto provvisorio: lo stile comune a tutti i giochi arriverà dopo. */
+:root {
+  --sfondo: #1f2a24; --pannello: #2b3a32; --testo: #f3efe4; --tenue: #aab8ae;
+  --carta: #fbf8ef; --rosso: #c0392b; --nero: #1c1c1c; --evid: #e6b84a; --ok: #6bbf8a;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--sfondo); color: var(--testo);
+  font: 17px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+#app { max-width: 480px; margin: 0 auto; padding: 10px 12px 8px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { opacity: .45; cursor: default; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+h1 { margin: 0; font-size: 1.15rem; white-space: nowrap; }
+h2 { margin: 6px 0; font-size: 1.2rem; }
+.mini { background: transparent; border: 1px solid var(--tenue); color: var(--tenue);
+  border-radius: 8px; padding: 4px 8px; font-size: .8rem; white-space: nowrap; }
+.info { display: flex; justify-content: space-between; align-items: center; margin: 8px 0 6px; color: var(--tenue); font-size: .9rem; }
+.info b { color: var(--testo); font-size: 1.1rem; }
+.info small { font-size: .8rem; }
+
+.tavolo { display: grid; grid-template-columns: 26px repeat(3, 1fr); gap: 5px; align-items: stretch; }
+.tavolo .testa { visibility: hidden; background: var(--pannello); border: 1px solid var(--tenue); border-radius: 6px; padding: 0; color: var(--evid); }
+.tavolo .testa.on { visibility: visible; }
+.tavolo .testa.sel { background: var(--evid); color: #222; }
+.tavolo .vuoto-angolo { visibility: hidden; }
+.tavolo .testa.col { height: 22px; }
+
+.carta { position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  background: var(--carta); color: var(--nero); border: 3px solid transparent; border-radius: 9px;
+  min-height: 60px; padding: 2px; line-height: 1.05; font-weight: 700; }
+.carta .v { font-size: 1.55rem; }
+.carta .s { font-size: 1.3rem; }
+.carta.rosso { color: var(--rosso); }
+.carta.jolly { background: #e9dcf7; color: #5b2d8e; }
+.carta.jolly .v { font-size: 1.05rem; letter-spacing: .04em; }
+.carta.vuota { background: transparent; border: 2px dashed #46584c; }
+.carta.scelta { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
+.carta.tolta { border-color: var(--ok); box-shadow: 0 0 0 2px var(--ok); }
+.carta.no { border-color: var(--rosso); box-shadow: 0 0 0 2px var(--rosso); }
+.fiori .carta { min-height: 68px; }
+
+.msg { min-height: 2.7em; margin: 6px 0 4px; color: var(--evid); font-size: .98rem; }
+.msg.ok { color: var(--ok); }
+.mano { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; min-height: 74px; }
+.mosse { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.mosse button, .azioni button, .grande { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 44px; padding: 2px 4px; font-weight: 600; line-height: 1.15; }
+.mosse button.on { border-color: var(--evid); background: #3d4a36; }
+.azioni { display: flex; gap: 6px; margin-top: 8px; }
+.azioni button { flex: 1; }
+.azioni .conferma { background: #2f6b46; border-color: var(--ok); }
+.dir { display: flex; gap: 6px; margin-top: 8px; }
+.dir button { flex: 1; background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px; min-height: 44px; }
+.dir button.on { border-color: var(--evid); }
+
+.scarti { margin-top: 8px; background: var(--pannello); border-radius: 10px; padding: 8px; }
+.scarti .elenco { display: flex; flex-wrap: wrap; gap: 3px; }
+.scarti .carta { width: 40px; min-height: 44px; border-width: 1px; }
+.scarti .carta .v { font-size: .95rem; } .scarti .carta .s { font-size: .9rem; }
+
+.pannello { background: var(--pannello); border-radius: 12px; padding: 14px; margin-top: 10px; }
+.pannello p { margin: 6px 0 12px; }
+.grande { width: 100%; min-height: 54px; margin-top: 8px; font-size: 1.05rem; }
+.grande.primo { background: #2f6b46; border-color: var(--ok); }
+.passo { background: var(--pannello); border-radius: 10px; padding: 10px 12px; margin-top: 8px; min-height: 5.5em; }
+.fine { text-align: center; }
+
+.crediti { max-width: 480px; margin: 0 auto; padding: 8px 12px 18px; color: var(--tenue); font-size: .82rem; text-align: center; }
+.crediti a { color: var(--tenue); }
+
+/* La guida della demo: nella partita vera non compare mai. */
+.guida { outline: 3px dashed #fff; outline-offset: 2px; animation: pulsa 1.1s ease-in-out infinite; }
+@keyframes pulsa { 50% { outline-color: var(--evid); } }
+@media (prefers-reduced-motion: reduce) { .guida { animation: none; } }
+.istruzione { color: var(--evid); }

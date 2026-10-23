@@ -1,0 +1,155 @@
+/*
+ * IL COMUNE — quello che si USA, uguale in tutti i giochi (Chiara, secondo giro, 23/10/2026 sera).
+ * Dopo il verdetto di Damiano sul primo giro, in comune restano solo: il carattere dell'interfaccia, le facce delle carte,
+ * i tasti e la Conferma, il messaggio, le vignette del tutorial, il marchio del portale. Titolo, forme, composizione e colori sono del gioco.
+ * Ogni gioco carica questo file e poi il suo (per The Emissary: emissary.css). Sostituisce lo style.css provvisorio a parità di DOM.
+ * (tavolo.css, qui accanto, è il primo giro: resta come storia, non si carica più.)
+ */
+
+/* Il carattere dell'interfaccia, comune a tutti i giochi: Barlow (Jeremy Tribby, SIL Open Font License 1.1, fonts/OFL-Barlow.txt).
+   Grottesco, un po' stretto, numeri chiari: sta sotto a un titolo in capitali romane come a uno pop. File in fonts/, niente rete. */
+@font-face { font-family: "Barlow"; src: url("fonts/Barlow-Regular.ttf") format("truetype"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Barlow"; src: url("fonts/Barlow-SemiBold.ttf") format("truetype"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Barlow"; src: url("fonts/Barlow-Bold.ttf") format("truetype"); font-weight: 700; font-display: block; }
+
+:root {
+  --carta: #FBF7EC; --carta-nero: #141414; --carta-rosso: #D1202F;
+  /* valori di sicurezza: li dà il gioco */
+  --fondo: #1A1A1E; --fondo-2: #2A2A31; --tema: #D9A441; --su-tema: #111; --accento: #D7263D; --inchiostro: #F3EEE2; --tenue: #A8A6A0;
+  --testo: "Barlow", system-ui, sans-serif;
+  --titolo: "Barlow", system-ui, sans-serif;   /* il gioco lo sostituisce col suo carattere */
+  --curva: cubic-bezier(.2, .8, .2, 1);
+  --ombra: 0 2px 0 rgba(0, 0, 0, .55);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--fondo); color: var(--inchiostro); font: 400 17px/1.4 var(--testo); overflow-x: hidden; min-height: 100vh; }
+#app { position: relative; z-index: 0; max-width: 560px; margin: 0 auto; padding: 0 10px 10px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { opacity: .4; cursor: default; }
+
+/* la testa: titolo (carattere del gioco), marchio del portale, due tasti piccoli */
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 10px; padding: 12px 0 10px; }
+.top .dx { display: flex; gap: 6px; margin-left: auto; }
+h1 { margin: 0; font: 700 1.8rem/1 var(--titolo); color: var(--inchiostro); }
+h2 { margin: 0 0 8px; font: 700 1.5rem/1.05 var(--titolo); }
+.marchio { width: 26px; height: 26px; flex: none; opacity: .9; }
+.mini { background: transparent; border: 2px solid var(--inchiostro); color: var(--inchiostro); border-radius: 0; padding: 0 10px; min-height: 40px;
+  font: 600 .82rem/1 var(--testo); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
+.punti { display: flex; justify-content: space-between; align-items: baseline; margin: 12px 0 6px; color: var(--tenue); font-size: .85rem; }
+.etichetta { margin: 12px 0 5px; color: var(--tenue); font: 600 .78rem/1.1 var(--testo); text-transform: uppercase; letter-spacing: .1em; }
+
+/* LE CARTE: avorio, indice in alto a sinistra, seme grande. Scelta: bordo di tema e si alza. Rifiutata: bordo d'accento. */
+.carta { position: relative; background: var(--carta); color: var(--carta-nero); border: 0; border-radius: 6px; box-shadow: var(--ombra);
+  padding: 0; line-height: 1; font-weight: 700; min-width: 0; outline: 3px solid transparent; outline-offset: -3px;
+  transition: transform 120ms var(--curva), outline-color 120ms linear; }
+.carta.R { color: var(--carta-rosso); }
+.carta .v, .carta .s { display: block; }
+.carta.scelta { outline-color: var(--tema); transform: translateY(-4px); box-shadow: 0 6px 0 rgba(0, 0, 0, .55); }
+.carta.no { outline-color: var(--accento); }
+.carta.suggerita { outline-color: var(--tema); }
+.dorso { background: var(--dorso) center / cover no-repeat; border-radius: 4px; box-shadow: var(--ombra); position: relative; }
+.dorso.vuota { background: none; box-shadow: none; border: 2px dashed var(--tenue); }
+.num { position: absolute; right: -8px; bottom: -8px; background: var(--inchiostro); color: #111; font: 700 .8rem/1 var(--testo);
+  min-width: 20px; height: 20px; padding: 0 5px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+
+/* I TASTI: uno solo pieno per schermata, col colore di tema e l'angolo tagliato; gli altri col bordo. La riga sta sotto il pollice. */
+.azioni { display: flex; gap: 8px; margin-top: 10px; position: sticky; bottom: 0; z-index: 5; padding: 8px 0; background: var(--fondo); }
+.azioni button, .grande, .due button, .potere, .quieto { background: transparent; border: 2px solid var(--inchiostro); color: var(--inchiostro); border-radius: 0;
+  min-height: 52px; padding: 4px 8px; font: 700 1.05rem/1 var(--testo); text-transform: uppercase; letter-spacing: .06em; }
+.azioni button { flex: 1; }
+.azioni .conferma, .grande.primo { background: var(--tema); border-color: var(--tema); color: var(--su-tema);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); }
+.azioni .conferma:disabled, .grande.primo:disabled { background: transparent; border-color: var(--tenue); color: var(--tenue); opacity: 1; clip-path: none; }
+.azioni button small { display: block; font: 400 .8rem/1.1 var(--testo); text-transform: none; letter-spacing: 0; margin-top: 3px; opacity: .85; }
+.azioni button.suggerita, .due button.suggerita, .grande.suggerita { outline: 3px solid var(--inchiostro); outline-offset: 2px; }
+.due button.scelta { background: var(--inchiostro); color: #111; border-color: var(--inchiostro); }
+.grande { width: 100%; min-height: 54px; margin-top: 8px; }
+.quieto { display: block; width: 100%; margin-top: 16px; border-color: var(--tenue); color: var(--tenue); min-height: 46px; font-size: .95rem; }
+
+/* IL MESSAGGIO: cosa è appena successo. Inchiostro, barra a sinistra: tema se è andata, accento se il motore ha detto di no. */
+.msg { min-height: 2.6em; margin: 10px 0 2px; padding: 2px 0 2px 10px; border-left: 3px solid var(--tema); font-size: .98rem; }
+/* quando il motore dice di no (o dice cosa manca prima), il messaggio salta all'occhio: cartello avorio, testo nero, banda d'accento.
+   Dice perché non si può, mai cosa conviene fare (ritocco del 24/10, Damiano: «quel messaggio non salta all'occhio»). */
+.msg:not(.ok):not(:empty) { background: var(--carta); color: #111; border-left: 6px solid var(--accento); padding: 10px 12px 11px; font-weight: 600; box-shadow: 0 4px 0 #000; margin: 12px 0 10px; }
+.msg:empty { border-left-color: transparent; }
+
+/* pannelli generici (domanda, fine), griglie di controllo */
+.pannello, .guarda, .scarti, .piano { background: var(--fondo-2); padding: 12px 14px; margin-top: 10px; clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); }
+.pannello p { margin: 6px 0 12px; }
+.fine { text-align: center; }
+.fine .punteggio { font: 700 2.4rem/1 var(--titolo); margin: 4px 0 0; }
+.fine .dettaglio { color: var(--tenue); font-size: .9rem; margin: 6px 0 12px; }
+.griglia span { text-align: center; font-size: .78rem; line-height: 2; min-width: 0; }
+.griglia .seme { color: var(--tenue); font-size: .95rem; }
+.griglia .seme.R { color: var(--carta-rosso); }
+.griglia .c { background: var(--fondo); color: var(--tenue); opacity: .6; }
+.griglia .c.si { background: var(--carta); color: var(--carta-nero); font-weight: 700; opacity: 1; }
+.griglia .c.si.R { color: var(--carta-rosso); }
+.guarda h3, .scarti h3 { margin: 0 0 6px; font: 600 .78rem/1.1 var(--testo); text-transform: uppercase; letter-spacing: .1em; color: var(--tenue); }
+
+/* IL TUTORIAL: la vignetta. «Tocca X, poi Conferma» sparisce (lo dice la vignetta, un pezzo alla volta). */
+.istruzione, .istr { display: none; }
+.strato-vignette { position: absolute; left: 0; top: 0; width: 100%; height: 0; z-index: 30; pointer-events: none; }
+.vignetta { position: absolute; background: var(--carta); color: #111; padding: 9px 14px 10px; border: 3px solid var(--tema); box-shadow: 5px 5px 0 #000; max-width: 260px;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); animation: entra 180ms var(--curva) both, salta 900ms ease-in-out 180ms infinite; }
+.vignetta .tocca { display: block; font: 700 .72rem/1 var(--testo); text-transform: uppercase; letter-spacing: .18em; color: var(--tema); margin-bottom: 3px; }
+.vignetta .cosa { display: block; font: 700 1.4rem/1 var(--testo); text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vignetta::after { content: ''; position: absolute; left: var(--punta, 50%); width: 0; height: 0; margin-left: -13px; border: 13px solid transparent; }
+.vignetta.sopra::after { top: 100%; border-top-color: var(--tema); border-bottom: 0; }
+.vignetta.sotto::after { bottom: 100%; border-bottom-color: var(--tema); border-top: 0; }
+.vignetta.sotto { animation-name: entra, salta-giu; }
+/* l'anello attorno alla cosa da toccare: spesso, nel colore d'accento, con un alone che pulsa */
+.mira { position: absolute; border: 4px solid var(--accento); border-radius: 10px; animation: pulsa 1.2s ease-in-out infinite; }
+@keyframes entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes salta { 50% { transform: translateY(-5px); } }
+@keyframes salta-giu { 50% { transform: translateY(5px); } }
+@keyframes pulsa { 50% { box-shadow: 0 0 0 7px var(--alone, rgba(255, 255, 255, .35)); } }
+@media (prefers-reduced-motion: reduce) { .vignetta, .mira, .suggerita { animation: none !important; } .carta { transition: none; } }
+
+/* LA COPERTINA: la prima schermata di ogni gioco (copertina.js). Titolo grande col carattere del gioco, una carta grande sul dorso che
+   fluttua piano, due tasti: Gioca e Tutorial. Serve anche come tessera del gioco nel catalogo del portale. */
+body.copertina .top { flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding-top: 22px; background: none; margin: 0; }
+body.copertina .top .dx { display: none; }
+body.copertina h1 { font-size: 2.6rem; text-align: center; line-height: 1; }
+body.copertina .pannello { background: transparent; clip-path: none; padding: 6px 0 0; margin-top: 0; text-align: center; }
+body.copertina .pannello h2 { display: none; }
+body.copertina .pannello p { font-size: .95rem; color: var(--tenue); max-width: 34ch; margin: 10px auto 18px; }
+.copertina-carta { display: flex; justify-content: center; padding: 10px 0 8px; }
+.copertina-carta .dorso-grande { width: 180px; height: 252px; border-radius: 12px; box-shadow: 0 10px 0 rgba(0, 0, 0, .5);
+  animation: fluttua 4s ease-in-out infinite; transform-origin: 50% 60%; }
+@keyframes fluttua { 0%, 100% { transform: rotate(-5deg) translateY(0); } 50% { transform: rotate(-2deg) translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .copertina-carta .dorso-grande { animation: none; transform: rotate(-4deg); } }
+body.copertina .grande { max-width: 340px; margin-left: auto; margin-right: auto; }
+
+/* I PEZZETTI (pezzi.js): il cartello sta fisso in basso, vicino al pollice; il tavolo resta visibile sopra; la cosa di cui parla il pezzetto
+   si accende (.acceso) e il resto si attenua. Niente va avanti da solo: ogni pezzetto si chiude con un tasto. */
+body.pezzi .passo { display: none; }
+body.pezzi #app > :not(.top):not(.punti) { pointer-events: none; }
+body.pezzi .azioni { visibility: hidden; }
+body.pezzi #app { padding-bottom: 46vh; }
+.pezzo { position: fixed; left: 0; right: 0; bottom: 0; z-index: 35; background: var(--carta); color: #111; border-top: 6px solid var(--tema);
+  box-shadow: 0 -4px 0 #000; padding: 10px 14px 12px; max-height: 46vh; overflow: auto; }
+.pezzo .dentro { max-width: 560px; margin: 0 auto; }
+.pezzo .kicker { display: flex; justify-content: space-between; font: 700 .7rem/1 var(--testo); text-transform: uppercase; letter-spacing: .14em; color: var(--tema); margin-bottom: 7px; }
+.pezzo p { margin: 0 0 8px; font-size: 1.02rem; line-height: 1.42; }
+.pezzo p b { color: var(--tema); }
+.pezzo .azioni-pezzo { display: flex; justify-content: flex-end; padding-top: 2px; }
+.pezzo .ok { background: var(--tema); color: var(--su-tema); border: 0; min-height: 46px; min-width: 130px; padding: 0 18px;
+  font: 700 1.05rem/1 var(--testo); text-transform: uppercase; letter-spacing: .06em; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); cursor: pointer; }
+.acceso { outline: 3px solid var(--acceso, var(--accento)) !important; outline-offset: 3px; box-shadow: 0 0 0 7px var(--alone, rgba(255, 255, 255, .3)) !important;
+  position: relative; z-index: 3; opacity: 1 !important; animation: none !important; }
+body.pezzi .carta:not(.acceso):not(.acceso *), body.pezzi .regno:not(.acceso), body.pezzi .potere:not(.acceso), body.pezzi .pila:not(.acceso),
+body.pezzi .gtit:not(.acceso), body.pezzi .conti:not(.acceso), body.pezzi .sovrano:not(.acceso):not(:has(.acceso)), body.pezzi .zona:not(.acceso):not(:has(.acceso)),
+body.pezzi .due button:not(.acceso), body.pezzi .quieto:not(.acceso), body.pezzi .etichetta { opacity: .4; }
+/* IL PROMEMORIA: dopo i pezzetti di un passo «gioca», l'ultimo pezzetto resta in alto in due righe; si tocca per leggerlo tutto */
+.passo.promemoria { cursor: pointer; padding-right: 30px; }
+.passo.promemoria p { margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.passo.promemoria::after { content: '▾'; position: absolute; right: 12px; top: 10px; font-size: .9rem; color: var(--tema); }
+.passo.promemoria.aperto p { display: block; -webkit-line-clamp: unset; }
+.passo.promemoria.aperto::after { content: '▴'; }
+
+.crediti { max-width: 560px; margin: 0 auto; padding: 18px 12px 22px; color: var(--tenue); font-size: .8rem; text-align: center; }
+.crediti a { color: var(--tenue); }
+.crediti p { margin: 4px 0; }
+@media (min-width: 700px) { body { font-size: 18px; } }

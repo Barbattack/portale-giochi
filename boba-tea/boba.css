@@ -1,0 +1,169 @@
+/*
+ * THE FIRST BOBA TEA SHOP IN LONDON — il tema (Chiara, 23/10/2026, notte). Si carica DOPO comune.css.
+ * Taro, mango e perle nere (i colori che a Damiano erano piaciuti del primo giro), spinti: forme nette, neri tagliati in diagonale come i
+ * pannelli di Persona 5, una fascia obliqua come i titoli di Casino Royale.
+ * La forma madre è LA TAZZA: le quattro code stanno dentro un bicchiere di taro al latte coi fianchi inclinati, chiuso in alto dal
+ * coperchio di mango (il bancone: le code partono da lì, il cliente «davanti» è quello più vicino al bancone) e in basso dal fondo nero
+ * dove si posano le perle: gli scarti, su tre file. Dietro il titolo passa la cannuccia, in diagonale. Accanto alla corona di The Emissary e
+ * alla scalinata di Syndicate, un bicchiere pieno di code si riconosce da lontano.
+ * Il titolo è in Bungee (David Jonathan Ross, SIL OFL 1.1, fonts/OFL-Bungee.txt): un carattere da insegna, disegnato per le insegne dei
+ * negozi; «BOBA TEA» grande, le due righe attorno piccole. L'interfaccia resta in Barlow, come in tutti i giochi.
+ */
+@font-face { font-family: "Bungee"; src: url("../comune/fonts/Bungee-Regular.ttf") format("truetype"); font-weight: 400; font-display: block; }
+
+:root {
+  --fondo: #241535;        /* taro di notte: tutta la pagina */
+  --fondo-2: #3A2559;      /* taro scuro: pannelli, mazzo */
+  --latte: #B79BE0;        /* taro al latte: il liquido nel bicchiere */
+  --perla: #121014;        /* le perle nere: coperchio dei tasti, i cartellini delle code, il fondo degli scarti */
+  --tema: #FFB627;         /* mango: coperchio, Conferma, il posto scelto, il titolo */
+  --su-tema: #141414;
+  --accento: #E0304A;      /* il rosso: il maleducato, Caccialo, la terza fila degli scarti */
+  --inchiostro: #F7F1FA;
+  --tenue: #BBA9D6;
+  --titolo: "Bungee", "Arial Black", sans-serif;
+  --alone: rgba(255, 182, 39, .35);
+  --acceso: var(--tema);
+  /* IL DORSO: la cornice comune (doppio bordino nei colori del gioco: mango fuori, taro al latte dentro) e, dentro, la tazza vista da
+     vicino: il liquido di taro con lo strato di latte in alto, la cannuccia di mango in diagonale, le perle nere sul fondo. Niente esce dalla cornice. */
+  --dorso: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 63 88'><rect width='63' height='88' rx='4' fill='%23241535'/><rect x='3' y='3' width='57' height='82' rx='2' fill='none' stroke='%23FFB627' stroke-width='1.6'/><rect x='6.5' y='6.5' width='50' height='75' fill='none' stroke='%23B79BE0' stroke-width='1'/><clipPath id='c'><rect x='8' y='8' width='47' height='72'/></clipPath><g clip-path='url(%23c)'><rect x='8' y='8' width='47' height='72' fill='%23B79BE0'/><polygon points='8,8 55,8 55,19 8,27' fill='%23E2D4F5'/><polygon points='10.8,78.6 17.2,81.4 49.2,9.4 42.8,6.6' fill='%23FFB627'/><g fill='%23121014'><circle cx='14' cy='74' r='5.5'/><circle cx='25.5' cy='76' r='5.5'/><circle cx='37' cy='74.5' r='5.5'/><circle cx='48.5' cy='73' r='5.5'/><circle cx='19.5' cy='64.5' r='5.5'/><circle cx='31.5' cy='65.5' r='5.5'/><circle cx='43' cy='63.5' r='5.5'/></g><g fill='%23F7F1FA'><circle cx='12' cy='72' r='1.4'/><circle cx='23.5' cy='74' r='1.4'/><circle cx='35' cy='72.5' r='1.4'/><circle cx='46.5' cy='71' r='1.4'/><circle cx='17.5' cy='62.5' r='1.4'/><circle cx='29.5' cy='63.5' r='1.4'/><circle cx='41' cy='61.5' r='1.4'/></g></g></svg>");
+}
+
+/* LA TESTA: il titolo su tre righe in un pannello nero tagliato in diagonale; dietro, la cannuccia di taro al latte bordata di nero */
+.top { position: relative; z-index: 0; margin: 0 -10px; padding: 14px 10px 10px; overflow: clip; }   /* clip: la cannuccia non fa scorrere la pagina di lato */
+.top::before { content: ''; position: absolute; z-index: -1; right: -40px; top: 46px; width: 460px; height: 22px; background: var(--latte);
+  border-top: 3px solid var(--perla); border-bottom: 3px solid var(--perla); transform: rotate(-16deg); transform-origin: right center; pointer-events: none; }
+h1 { display: flex; flex-direction: column; align-items: flex-start; margin-right: auto; background: var(--perla); color: var(--tema); padding: 7px 14px 8px 12px;
+  font: 400 1rem/1 var(--titolo); text-transform: uppercase; clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+h1 .r1, h1 .r3 { font-size: .62rem; letter-spacing: .16em; color: var(--inchiostro); }
+h1 .r2 { font-size: 1.5rem; margin: 3px 0 4px; }
+h2 { font: 400 1.4rem/1.1 var(--titolo); text-transform: uppercase; }
+.mini { background: var(--fondo); border-color: var(--tenue); }
+.punti { margin-top: 10px; }
+
+/* LA COPERTINA: titolo grande al centro, la cannuccia dietro */
+body.copertina h1 { align-items: center; text-align: center; margin-right: 0; padding: 9px 20px 11px; clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+body.copertina h1 .r1, body.copertina h1 .r3 { font-size: .92rem; letter-spacing: .2em; }
+body.copertina h1 .r2 { font-size: 2.8rem; margin: 5px 0 6px; }
+body.copertina .copertina-carta { padding: 4px 0 2px; }
+body.copertina .pannello p { margin: 8px auto 12px; }
+body.copertina .top { margin: 0 -10px; padding-top: 16px; }
+body.copertina .top::before { top: 96px; right: -60px; width: 620px; height: 30px; transform: rotate(-14deg); }
+
+/* MAZZO E CARTA IN MANO. La pila «Scarti» in alto sparisce: gli scarti sono il fondo della tazza, con tutte le carte in vista. */
+.pile { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 10px; align-items: center; }
+.pile div.pila { display: none; }
+.pila { display: flex; align-items: center; gap: 12px; background: var(--fondo-2); border: 0; border-radius: 0; padding: 7px 10px; min-height: 64px; text-align: left; color: var(--inchiostro);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+.pila.on { outline: 3px solid var(--tema); outline-offset: -3px; }
+.pila .dorso { width: 34px; height: 47px; flex: none; }
+.pila .nome { font: 400 1rem/1.1 var(--titolo); text-transform: uppercase; letter-spacing: .04em; }
+.pila .nome small { display: block; font: 400 .72rem/1.2 var(--testo); text-transform: none; letter-spacing: 0; color: var(--tenue); margin-top: 2px; }
+.inmano { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 72px; }
+.inmano .etichetta { margin: 0; }
+.carta { width: 54px; height: 72px; display: grid; grid-template-rows: auto 1fr; }
+.carta .v { justify-self: start; padding: 4px 0 0 6px; font: 700 1.2rem/1 var(--testo); }
+.carta .s { align-self: center; justify-self: center; font-size: 1.9rem; margin-top: -8px; }
+.carta.vuota { background: none; border: 2px dashed var(--tenue); box-shadow: none; }
+#app:has(.inmano .carta:not(.vuota)) .inmano .carta { outline: 3px solid var(--accento); outline-offset: 2px; }
+
+/* IL MESSAGGIO del maleducato salta all'occhio come un rifiuto: cartello avorio, banda rossa */
+#app:has(.inmano .carta:not(.vuota)) .msg { background: var(--carta); color: #111; border-left: 6px solid var(--accento); padding: 10px 12px 11px; font-weight: 600; box-shadow: 0 4px 0 #000; margin: 12px 0 10px; }
+
+/* RESTA o CACCIALO: due tasti dello stesso peso, con sotto quanto costano. Nessuno dei due è «quello giusto». */
+.azioni .resta { border-color: var(--inchiostro); }
+.azioni .caccia { border-color: var(--accento); }
+.azioni .caccia small { color: #FFB3BE; }
+
+/* LA TAZZA: il bicchiere di taro al latte coi fianchi inclinati; sopra il coperchio di mango (il bancone), dentro le quattro code */
+.code { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; align-items: start; margin: 14px -4px 0; padding: 28px 10px 16px;
+  background: var(--latte); clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%); }
+.bancone { display: block; position: absolute; left: 0; right: 0; top: 0; height: 16px; background: var(--tema); border-bottom: 4px solid var(--perla); }
+.coda { display: flex; flex-direction: column; gap: 4px; background: transparent; border: 0; padding: 0; min-width: 0; }
+.coda .testa { width: 100%; background: var(--perla); border: 0; padding: 5px 0 6px; min-height: 42px; text-align: center; color: var(--inchiostro);
+  font: 400 .86rem/1 var(--titolo); text-transform: uppercase; letter-spacing: .02em; clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+.coda .testa small { display: block; font: 600 .66rem/1.3 var(--testo); text-transform: none; letter-spacing: 0; color: var(--tenue); margin-top: 2px; }
+.coda .testa:disabled { opacity: 1; cursor: default; }
+.coda.on .testa { background: var(--tema); color: var(--su-tema); }
+.coda.on .testa small { color: #5A3E00; }
+.testa.suggerita, .slot.suggerita { outline: 3px solid var(--perla); outline-offset: 2px; }
+.lista { display: flex; flex-direction: column; gap: 3px; }
+/* le carte in coda sono strisce: il più alto in cima (davanti, verso il bancone), il più basso in fondo */
+.cs { display: flex; justify-content: center; align-items: center; gap: 3px; background: var(--carta); color: var(--carta-nero); border-radius: 4px; height: 32px;
+  font: 700 1.15rem/1 var(--testo); box-shadow: 0 2px 0 rgba(0, 0, 0, .5); }
+.cs.R { color: var(--carta-rosso); }
+.cs .s { font-size: 1rem; }
+.cs.fantasma { background: transparent; box-shadow: none; color: #fff; height: 100%; }
+/* LO SPAZIO: fra due clienti (e davanti al primo, e dietro all'ultimo) c'è scritto quanti numeri ci starebbero. È il cuore del ragionamento. */
+.sp { display: flex; align-items: center; height: 18px; color: var(--perla); font: 700 .82rem/1 var(--testo); }
+.sp::before, .sp::after { content: ''; flex: 1; height: 2px; background: rgba(18, 16, 20, .3); }
+.sp::before { margin-right: 5px; } .sp::after { margin-left: 5px; }
+/* nella coda aperta i posti si toccano: lo stesso numero, grande, e accanto da quale a quale */
+.slot { display: flex; justify-content: center; align-items: center; gap: 5px; height: 38px; width: 100%; padding: 0; background: rgba(255, 255, 255, .28);
+  border: 2px dashed var(--perla); border-radius: 6px; color: var(--perla); font: 700 1.05rem/1 var(--testo); }
+.slot .r { font: 600 .66rem/1 var(--testo); opacity: .85; }
+.slot.scelto { background: var(--tema); border: 2px solid var(--tema); color: var(--su-tema); }
+.slot.fisso { background: var(--accento); border-color: var(--accento); color: #fff; height: 36px; }
+/* IL FONDO DELLA TAZZA: le perle. Gli scarti, su tre file; la terza fila è la bomba e lo dice il rosso */
+.scarti { margin: 0 1.5%; padding: 10px 18px 16px; background: var(--perla); clip-path: polygon(1.5% 0, 98.5% 0, 95% 100%, 5% 100%); }
+.scarti h3 { color: var(--tenue); }
+.fila { display: flex; gap: 8px; align-items: flex-start; margin-top: 2px; min-height: 26px; }
+.fila .volte { flex: none; min-width: 2em; color: var(--tenue); font: 400 .95rem/26px var(--titolo); white-space: nowrap; }
+.fila.pericolo .volte { color: var(--accento); }
+.fila.pericolo:has(.chip) .volte::after { content: ' bomba'; font: 700 .72rem/26px var(--testo); text-transform: uppercase; letter-spacing: .08em; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { background: var(--carta); color: var(--carta-nero); border-radius: 3px; font: 700 .92rem/26px var(--testo); min-width: 32px; padding: 0 4px; text-align: center; box-shadow: 0 2px 0 rgba(0, 0, 0, .6); }
+.chip.R { color: var(--carta-rosso); }
+.fila.pericolo .chip { outline: 2px solid var(--accento); outline-offset: -2px; }
+.griglia { display: grid; grid-template-columns: 1.4em repeat(13, 1fr); gap: 2px; }
+.griglia span { font-size: .7rem; line-height: 1.9; }
+.pannello h2 { color: var(--tema); }
+.fine .punteggio { color: var(--tema); }
+.quieto { border-color: var(--fondo-2); }
+.mira { border-color: var(--perla); }
+
+/* I COMANDI VICINO AL POLLICE: app.js mette Conferma / Resta / Caccialo prima delle code; qui la riga dei tasti va dopo la tazza e resta
+   appiccicata in basso (comune: .azioni sticky). Per Erbottega è un ordine di elementi da cambiare in app.js (tavolo()). */
+#app > div:not([class]) { display: flex; flex-direction: column; }
+#app > div:not([class]) > .pile { order: -10; } #app > div:not([class]) > .guarda { order: -9; } #app > div:not([class]) > .msg { order: -8; }
+#app > div:not([class]) > .code { order: 0; } #app > div:not([class]) > .scarti { order: 1; } #app > div:not([class]) > .azioni { order: 2; margin-top: 12px; }
+.msg:empty { min-height: 0; margin: 4px 0 0; }
+
+/* IL TUTORIAL (come Syndicate e The Emissary). I pezzetti li fa pezzi.js (comune); qui il promemoria appiccicato in alto e il modo «trova». */
+#app { display: flex; flex-direction: column; }
+#app > .top { order: -10; } #app > .punti { order: -9; } #app > .passo { order: -7; }
+.passo { margin-top: 10px; padding: 10px 14px; background: var(--fondo-2); font-size: .98rem; line-height: 1.4; clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); }
+body:not(.leggi) .passo { position: sticky; top: 0; z-index: 6; background: var(--carta); color: #111; border-left: 6px solid var(--tema);
+  padding: 10px 14px 11px 12px; clip-path: none; box-shadow: 0 4px 0 #000; font-weight: 500; }
+.passo .istruzione { display: none; }
+.passo ~ .azioni:empty { display: none; }
+/* nel turno «trova» né la coda né il posto si accendono: li trova il giocatore */
+body.trova .testa.suggerita, body.trova .slot.suggerita { outline: none; animation: none; }
+/* quando parlano i pezzetti, si attenua tutto ciò che non è acceso */
+body.pezzi .cs:not(.acceso), body.pezzi .testa:not(.acceso), body.pezzi .sp:not(.acceso), body.pezzi .slot:not(.acceso), body.pezzi .bancone:not(.acceso),
+body.pezzi .scarti:not(.acceso):not(:has(.acceso)), body.pezzi .fila:not(.acceso), body.pezzi .azioni button:not(.acceso), body.pezzi .pila:not(.acceso) { opacity: .4; }
+body.pezzi .scarti:not(.acceso):has(.acceso) .fila:not(.acceso), body.pezzi .scarti:not(.acceso):has(.acceso) h3 { opacity: .4; }
+body.pezzi .scarti.acceso .fila { opacity: 1; }
+body.pezzi .azioni { visibility: visible; }   /* Resta e Caccialo si devono vedere mentre i pezzetti ne parlano */
+body.pezzi .passo ~ .azioni { visibility: hidden; }
+.fila.acceso, .sp.acceso { outline-offset: 1px; }
+
+/* LE REGOLETTE: «Come si gioca», una schermata sola, sei regole disegnate (overlay del prototipo, tutorial.js) */
+.regole { position: fixed; inset: 0; z-index: 40; background: var(--fondo); color: var(--inchiostro); overflow-y: auto; padding: 14px 12px 20px; }
+.regole .dentro { max-width: 560px; margin: 0 auto; }
+.regole h2 { color: var(--tema); font-size: 1.6rem; margin: 6px 0 12px; }
+.regole ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.regole li { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; background: var(--fondo-2); padding: 10px 12px 10px 8px; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+.regole li svg { width: 64px; height: 56px; display: block; }
+.regole li b { display: block; font: 700 .95rem/1.15 var(--testo); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+.regole li span { font-size: .92rem; line-height: 1.35; color: #E3DAEE; }
+.regole li span i { font-style: normal; color: var(--tema); font-weight: 700; }
+.regole .azioni { position: sticky; bottom: 0; background: var(--fondo); margin-top: 12px; }
+.regole .azioni button.chiudi { border-color: var(--tenue); color: var(--inchiostro); }
+
+@media (min-width: 700px) {
+  .cs { height: 36px; font-size: 1.25rem; }
+  .slot { height: 42px; }
+  h1 .r2 { font-size: 1.8rem; }
+  body.copertina h1 .r2 { font-size: 3.6rem; }
+}

@@ -1,0 +1,77 @@
+/* Aspetto provvisorio: lo stile comune a tutti i giochi arriverà dopo. */
+:root {
+  --sfondo: #1f2a24; --pannello: #2b3a32; --testo: #f3efe4; --tenue: #aab8ae;
+  --carta: #fbf8ef; --nero: #1c1c1c; --rosso: #c0392b; --evid: #e6b84a; --ok: #6bbf8a; --no: #e0594a;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--sfondo); color: var(--testo);
+  font: 17px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+#app { max-width: 460px; margin: 0 auto; padding: 10px 8px 8px; }
+button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+button:disabled { opacity: .45; cursor: default; }
+
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; }
+h1 { margin: 0; font-size: 1.1rem; white-space: nowrap; }
+h2 { margin: 6px 0; font-size: 1.2rem; }
+.mini { background: transparent; border: 1px solid var(--tenue); color: var(--tenue);
+  border-radius: 8px; padding: 6px 8px; font-size: .8rem; white-space: nowrap; min-height: 40px; }
+.punti { display: flex; justify-content: space-between; align-items: baseline; margin: 8px 2px 4px; color: var(--tenue); font-size: .85rem; }
+.punti b { color: var(--testo); font-size: 1.35rem; }
+.punti .tot { text-align: center; }
+
+/* il cortile: 6 colonne (posto, 4 colonne di carte, posto) x 5 righe */
+.cortile { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin-top: 6px; }
+.cortile > * { width: 100%; aspect-ratio: 10 / 11; min-width: 0; }
+.angolo { visibility: hidden; }
+.carta, .dorso, .posto.vuoto { display: flex; flex-direction: column; justify-content: center; align-items: center;
+  border-radius: 8px; padding: 0; line-height: 1.05; font-weight: 700; border: 3px solid transparent; }
+.carta { background: var(--carta); color: var(--nero); }
+.carta.H, .carta.D { color: var(--rosso); }
+.carta .v, .carta .s { font-size: clamp(1rem, 5.4vw, 1.5rem); }
+.carta .s { font-size: clamp(1.1rem, 6vw, 1.7rem); }
+.carta.compagno { background: #f3dfa2; border-color: #b8902a; }
+.dorso { background-color: #3c68ad;
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 3px, transparent 3px 8px),
+                    repeating-linear-gradient(-45deg, rgba(255,255,255,.18) 0 3px, transparent 3px 8px);
+  border-color: #d6e4f7; }
+.posto.vuoto { background: transparent; border: 2px dashed #5d7366; color: #6f8577; font-size: 1.5rem; font-weight: 400; }
+.scelta { box-shadow: 0 0 0 3px var(--evid); border-color: var(--evid); }
+.carta.scelta { border-color: var(--evid); }
+.suggerita { border-color: var(--evid); animation: pulsa 1.2s ease-in-out infinite; }
+.no { border-color: var(--no); box-shadow: 0 0 0 3px var(--no); }
+.mosse button.suggerita, .azioni .suggerita { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
+@keyframes pulsa { 50% { box-shadow: 0 0 0 5px var(--evid); } }
+@media (prefers-reduced-motion: reduce) { .suggerita { animation: none; box-shadow: 0 0 0 3px var(--evid); } }
+
+.sotto { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+.mazzo { width: 64px; flex: none; text-align: center; font-size: .72rem; color: var(--tenue); line-height: 1.2; }
+.mazzo .carta, .mazzo .vuoto { width: 48px; height: 62px; margin: 0 auto 2px; }
+.mazzo .vuoto { border: 2px dashed #5d7366; border-radius: 8px; }
+.msg { flex: 1; min-height: 3.8em; margin: 0; color: var(--evid); font-size: .95rem; display: flex; align-items: center; }
+.msg.ok { color: var(--ok); }
+
+.mosse { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 8px; }
+.mosse button { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 48px; padding: 2px 4px; font-weight: 600; font-size: .9rem; line-height: 1.1; }
+.mosse button.on { border-color: var(--evid); background: #3d4a36; }
+.azioni { display: flex; gap: 6px; margin-top: 8px; }
+.azioni button, .grande { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 50px; padding: 2px 4px; font-weight: 600; flex: 1; }
+.azioni .conferma, .grande.primo { background: #2f6b46; border-color: var(--ok); }
+
+.pannello { background: var(--pannello); border-radius: 12px; padding: 14px; margin-top: 10px; }
+.pannello p { margin: 6px 0 12px; }
+.grande { width: 100%; min-height: 54px; margin-top: 8px; font-size: 1.05rem; }
+.passo { background: var(--pannello); border-radius: 10px; padding: 10px 12px; margin-top: 8px; min-height: 9em; font-size: .95rem; }
+.istruzione { display: block; margin-bottom: 6px; color: var(--evid); }
+.fine { text-align: center; }
+.dueBottoni { display: flex; gap: 8px; }
+
+.crediti { max-width: 460px; margin: 0 auto; padding: 8px 12px 18px; color: var(--tenue); font-size: .82rem; text-align: center; }
+.crediti a { color: var(--tenue); }
+
+@media (min-width: 700px) {
+  body { font-size: 18px; }
+  #app { padding-top: 20px; }
+}

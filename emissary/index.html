@@ -4,15 +4,23 @@
   <meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Emissary</title>
-<meta name="description" content="The Emissary: un solitario di carte a prese. Vinci esattamente il numero giusto di dibattiti in otto regni. Di Wil Su, dalla collezione Isaludo.">
-<link rel="stylesheet" href="style.css">
+<title>The Emissary — prototipo, terzo giro (Chiara, 24/10/2026)</title>
+<!-- Prototipo di disegno: legge in sola lettura engine.js, demo.js e app.js del gioco vero (tre cartelle sopra).
+     comune.css (quello che si usa, uguale per tutti i giochi) + emissary.css (la corona, i colori, il titolo, il tutorial, le regolette).
+     copione.js è IL FILE DEI TESTI (Penna lo riscrive); tutorial.js (solo prototipo) lo legge e fa la partita guidata; vignette.js le vignette. -->
+<link rel="stylesheet" href="../comune/comune.css">
+<link rel="stylesheet" href="emissary.css">
 </head>
 <body>
 <main id="app" aria-live="polite"></main>
 <footer class="crediti" id="crediti"></footer>
 <script src="engine.js"></script>
 <script src="demo.js"></script>
+<script src="copione.js"></script>
+<script src="../comune/pezzi.js"></script>
+<script src="tutorial.js"></script>
+<script src="../comune/copertina.js"></script>
 <script src="app.js"></script>
+<script src="../comune/vignette.js"></script>
 </body>
 </html>

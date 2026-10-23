@@ -4,15 +4,24 @@
   <meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gioco di carte</title>
-<meta name="description" content="Un rompicapo di carte da giocare da soli. Di Wil Su, dalla collezione Isaludo.">
-<link rel="stylesheet" href="style.css">
+<title>Syndicate — prototipo (Chiara, 23/10/2026)</title>
+<!-- Prototipo di disegno: legge in sola lettura engine.js, demo.js e app.js del gioco vero (tre cartelle sopra).
+     comune.css (quello che si usa, uguale per tutti i giochi) + syndicate.css (la scalinata, i colori, il titolo, il tutorial, le regolette).
+     copione.js è IL FILE DEI TESTI (Penna lo riscrive); tutorial.js (solo prototipo) lo legge e fa la partita guidata; vignette.js le vignette. -->
+<link rel="stylesheet" href="../comune/comune.css">
+<link rel="stylesheet" href="syndicate.css">
 </head>
 <body>
 <main id="app" aria-live="polite"></main>
 <footer class="crediti" id="crediti"></footer>
+<script>window.CopertinaRiga = 'Chicago, anni Trenta. Sei un poliziotto e infiltri i tuoi uomini in una famiglia mafiosa. Falli salire, un posto alla volta, dal Soldato fino a scavalcare il Boss: quel giorno la famiglia cade.';</script>
 <script src="engine.js"></script>
 <script src="demo.js"></script>
+<script src="copione.js"></script>
+<script src="../comune/pezzi.js"></script>
+<script src="tutorial.js"></script>
+<script src="../comune/copertina.js"></script>
 <script src="app.js"></script>
+<script src="../comune/vignette.js"></script>
 </body>
 </html>

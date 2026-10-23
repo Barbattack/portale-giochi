@@ -1,0 +1,94 @@
+/* Aspetto provvisorio: lo stile comune a tutti i giochi arriverà dopo. */
+:root {
+  --sfondo: #1f2a24; --pannello: #2b3a32; --testo: #f3efe4; --tenue: #aab8ae;
+  --carta: #fbf8ef; --nero: #1c1c1c; --evid: #e6b84a; --ok: #6bbf8a; --no: #c0392b; --rosso: #c62f2f;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--sfondo); color: var(--testo);
+  font: 17px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+#app { max-width: 520px; margin: 0 auto; padding: 10px 12px 8px; }
+button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:disabled { opacity: .45; cursor: default; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.dx { display: flex; gap: 6px; }
+h1 { margin: 0; font-size: 1.15rem; white-space: nowrap; }
+h2 { margin: 6px 0; font-size: 1.2rem; }
+.mini { background: transparent; border: 1px solid var(--tenue); color: var(--tenue);
+  border-radius: 8px; padding: 8px 8px; font-size: .8rem; white-space: nowrap; min-height: 44px; }
+.mini.attento { border-color: var(--evid); color: var(--evid); }
+.etichetta { margin: 6px 0 3px; color: var(--tenue); font-size: .8rem; }
+
+.stato { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0 2px; color: var(--tenue); font-size: .88rem; }
+.stato b { color: var(--testo); font-size: 1.3rem; }
+.assi i { font-style: normal; font-size: 1.35rem; margin-left: 6px; opacity: .3; }
+.assi i.preso { opacity: 1; }
+.assi i.rosso { color: #e86a6a; } .assi i.nero { color: var(--testo); }
+
+/* le carte */
+.carta { display: flex; flex-direction: column; justify-content: center; align-items: center;
+  border: 2px solid transparent; border-radius: 6px; padding: 0; line-height: 1; font-weight: 700; background: var(--carta); color: var(--nero); }
+.carta.su.rosso { color: var(--rosso); }
+.carta.jolly { color: #7a4fbf; }
+.carta .v { font-size: 1rem; } .carta .s { font-size: .8rem; margin-top: 1px; }
+.carta.dorso { background: repeating-linear-gradient(45deg, #2d4a7a 0 4px, #24406b 4px 8px); border-color: #e8e4d6; }
+.carta.vuoto { background: transparent; border: 2px dashed #4b5f53; }
+button.carta { cursor: pointer; }
+.carta.scelta { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
+.carta.suggerita { border-color: var(--evid); animation: pulsa 1.2s ease-in-out infinite; }
+.carta.arrivo { border-color: #4fd0e8; box-shadow: 0 0 0 3px #4fd0e8; }
+.carta.via { opacity: .65; }
+.mosse button.suggerita, .azioni .suggerita { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
+.istruzione { display: block; margin-bottom: 6px; color: var(--evid); }
+@keyframes pulsa { 50% { box-shadow: 0 0 0 4px var(--evid); } }
+@media (prefers-reduced-motion: reduce) { .carta.suggerita { animation: none; box-shadow: 0 0 0 2px var(--evid); } }
+
+/* la cima: Sei qui, Poi, appunti */
+.cima { display: flex; gap: 8px; align-items: flex-start; }
+.blocco { flex: none; }
+.carta.cimac { width: 64px; height: 88px; }
+.carta.cimac .v { font-size: 1.7rem; } .carta.cimac .s { font-size: 1.3rem; }
+.slots { display: flex; gap: 4px; }
+.carta.nota { width: 44px; height: 62px; }
+.carta.nota .v { font-size: 1.15rem; } .carta.nota .s { font-size: .95rem; }
+.appunti { margin-left: auto; }
+
+/* il tempio ad anello, srotolato dalla cima */
+.anello { border: 2px dashed #4b5f53; border-radius: 14px; padding: 6px 5px 4px; }
+.griglia { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 3px; }
+.cella { text-align: center; min-width: 0; }
+.cella .carta { width: 100%; height: 40px; }
+.cella .ix { display: block; font-size: .62rem; color: var(--tenue); line-height: 1.3; }
+.vuoto-t { grid-column: 1 / -1; color: var(--tenue); font-size: .85rem; }
+.chiude { margin-top: 4px; text-align: center; color: var(--tenue); font-size: .75rem; }
+.nota-ix { margin-top: 3px; color: var(--tenue); font-size: .72rem; text-align: center; }
+
+.msg { min-height: 3em; margin: 6px 0 2px; color: var(--evid); font-size: .98rem; }
+.msg.ok { color: var(--ok); }
+.mosse { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mosse button { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 52px; padding: 2px 6px; font-weight: 600; font-size: .95rem; line-height: 1.1; }
+.mosse button.on { border-color: var(--evid); background: #3d4a36; }
+.azioni { display: flex; gap: 6px; margin-top: 8px; }
+.azioni button, .grande-b { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+  min-height: 52px; padding: 2px 4px; font-weight: 600; flex: 1; }
+.azioni .conferma { background: #2f6b46; border-color: var(--ok); font-size: 1.05rem; }
+.azioni .arrendo { flex: 0 0 34%; background: transparent; border: 1px solid #7a5a5a; color: #d9a3a3; font-size: .9rem; font-weight: 500; }
+.azioni .arrendo.on { border-color: var(--evid); color: var(--evid); border-width: 2px; }
+
+.pannello { background: var(--pannello); border-radius: 12px; padding: 14px; margin-top: 10px; }
+.pannello p { margin: 6px 0 12px; }
+button.grande { width: 100%; min-height: 54px; margin-top: 8px; font-size: 1.05rem;
+  background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px; font-weight: 600; }
+button.grande.primo { background: #2f6b46; border-color: var(--ok); }
+.passo { background: var(--pannello); border-radius: 10px; padding: 10px 12px; margin-top: 8px; min-height: 8em; }
+.fine { text-align: center; }
+
+.crediti { max-width: 520px; margin: 0 auto; padding: 8px 12px 18px; color: var(--tenue); font-size: .82rem; text-align: center; }
+.crediti a { color: var(--tenue); }
+
+@media (min-width: 700px) {
+  body { font-size: 18px; }
+  #app { padding-top: 24px; }
+}
