@@ -96,7 +96,7 @@
       vede: 'Il tavolo dopo cinque turni: Coda 1 5♦ · Coda 2 D♦ · Coda 3 6♣ 10♦ · Coda 4 A♠ 8♣ 9♠ R♠. Scarti: 5♠ 7♣ nella prima fila, 5♥ nella seconda. Mazzo: 41.',
       pezzi: [{ riga: 0, accendi: ['spazi'] }, { riga: 1, accendi: ['scarti'] }, { riga: 2, accendi: ['mazzo'] }],
       concetti: ['le due domande di ogni turno', 'continuare da soli', 'il mazzo si può guardare'],
-      titolo: 'Ora tocca a te', bozza: 'A ogni turno, prima di scegliere, ti fai due domande. La prima: **dove c\'è più spazio?** Te lo dicono i numeri sui posti.\nLa seconda: **quanto mi costa se va male?** Lasciare stare un maleducato costa tutta la coda, cacciarlo due clienti. E se nella coda c\'è un numero già nella terza fila degli scarti, perdere la coda vuol dire perdere la partita.\nDa qui continui da solo, in questa stessa partita: scegli il posto con tanto spazio e un prezzo che puoi pagare. Prima di pescare puoi toccare il mazzo per vedere chi manca, non in che ordine arriva. Vinci se lo finisci.' }
+      titolo: 'Ora tocca a te', bozza: 'A ogni turno, prima di scegliere, ti fai due domande. La prima: **dove c\'è più spazio?** Fra poco i numeri sui posti spariscono, e lo spazio lo conti tu: fra l\'Asso e l\'8 ce ne stanno otto, perché valgono anche l\'Asso e l\'8.\nLa seconda: **quanto mi costa se va male?** Lasciare stare un maleducato costa tutta la coda, cacciarlo due clienti. E se nella coda c\'è un numero già nella terza fila degli scarti, perdere la coda vuol dire perdere la partita.\nDa qui continui da solo, in questa stessa partita: scegli il posto con tanto spazio e un prezzo che puoi pagare. Prima di pescare puoi toccare il mazzo per vedere chi manca, non in che ordine arriva. Vinci se lo finisci.' }
   ];
 
   // GLI AIUTI dei turni «trova»: arrivano solo se il giocatore sbaglia, e lo riportano al ragionamento senza dirgli la risposta. BOZZA.
@@ -114,7 +114,7 @@
   var REGOLE = [
     ['code', 'Quattro code', 'Davanti al tuo chiosco di bubble tea quattro code, e ogni carta è un cliente. In ogni coda si sta dal <i>più basso in fondo</i> al <i>più alto davanti</i>, dall\'Asso al Re (K); due uguali possono stare vicini.'],
     ['turno', 'Prima il posto, poi il cliente', 'Scegli una coda e un posto: davanti al più alto, dietro al più basso, o fra due vicini. Solo dopo peschi: se il cliente ci sta, entra. Prima di pescare puoi toccare il mazzo e vedere chi manca.'],
-    ['spazio', 'Dove c\'è più spazio?', 'Il numero su ogni posto dice <i>quanti numeri ci starebbero</i>: fra un 8 e un Asso otto, davanti a un Re uno solo. Più spazio, più probabilità che il prossimo ci stia.'],
+    ['spazio', 'Dove c\'è più spazio?', 'Conta tu <i>quanti numeri ci starebbero</i> in un posto, compresi quelli dei clienti accanto: fra un Asso e un 8 otto, dall\'Asso all\'8; davanti a un Re uno solo, un altro Re. Più spazio, più probabilità che il prossimo ci stia.'],
     ['maleducato', 'Il maleducato', 'Chi non ci sta salta la fila. <i>Resta</i>: tutta la coda se ne va, e lui ne comincia una nuova. <i>Caccialo</i>: il vigile porta via lui e il prossimo del mazzo, e il cliente dopo prova lo stesso posto.'],
     ['scarti', 'Gli scarti', 'Chi se ne va finisce qui, su tre file: il primo di ogni numero nella prima, il secondo nella seconda, il terzo nella terza, ed è una <i>bomba</i>: al quarto hai perso.'],
     ['fine', 'Vincere e perdere', 'Vinci se finisci il mazzo: il punteggio sono i clienti rimasti in coda. Perdi appena se ne va il quarto cliente con lo stesso numero. Col mazzo vuoto puoi ancora cacciare: se ne va solo lui.']

@@ -75,8 +75,12 @@ body.copertina .top::before { top: 96px; right: -60px; width: 620px; height: 30p
 .azioni .caccia { border-color: var(--accento); }
 .azioni .caccia small { color: #FFB3BE; }
 
-/* LA TAZZA: il bicchiere di taro al latte coi fianchi inclinati; sopra il coperchio di mango (il bancone), dentro le quattro code */
-.code { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; align-items: start; margin: 14px -4px 0; padding: 28px 10px 16px;
+/* LA TAZZA: il bicchiere di taro al latte coi fianchi inclinati; sopra il coperchio di mango (il bancone), dentro le quattro code.
+   I fianchi stringono del 3% per lato dall'alto in basso; le colonne sono rettangoli, quindi stanno dentro la parte PIÙ STRETTA, il fondo:
+   lo spazio ai lati è 3% (quanto stringe il fianco) + 8 px (l'alone dei pezzetti del tutorial è 7 px). Così niente si taglia, a qualunque
+   lunghezza di coda e a qualunque larghezza (Damiano, 24/10: «taglia dei pezzi laterali»). Prima era 10 px fissi: al fondo di una coda
+   lunga le carte di coda 1 e 4 uscivano dal bicchiere (0,8 px a 375, 6 px a 1280). */
+.code { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; align-items: start; margin: 14px -4px 0; padding: 28px calc(3% + 8px) 16px;
   background: var(--latte); clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%); }
 .bancone { display: block; position: absolute; left: 0; right: 0; top: 0; height: 16px; background: var(--tema); border-bottom: 4px solid var(--perla); }
 .coda { display: flex; flex-direction: column; gap: 4px; background: transparent; border: 0; padding: 0; min-width: 0; }
@@ -98,14 +102,19 @@ body.copertina .top::before { top: 96px; right: -60px; width: 620px; height: 30p
 .sp { display: flex; align-items: center; height: 18px; color: var(--perla); font: 700 .82rem/1 var(--testo); }
 .sp::before, .sp::after { content: ''; flex: 1; height: 2px; background: rgba(18, 16, 20, .3); }
 .sp::before { margin-right: 5px; } .sp::after { margin-left: 5px; }
-/* nella coda aperta i posti si toccano: lo stesso numero, grande, e accanto da quale a quale */
+/* nella coda aperta i posti si toccano. NEL TUTORIAL (.slot.conta) portano lo stesso numero, grande, e accanto da quale a quale.
+   IN PARTITA niente numeri (Damiano, 24/10: «altrimenti gioca da solo il gioco»): il posto è la casella tratteggiata con un «+» grande,
+   e quando è scelto diventa di mango e dice QUI (i testi «+» e «qui» sono quelli di app.js). */
 .slot { display: flex; justify-content: center; align-items: center; gap: 5px; height: 38px; width: 100%; padding: 0; background: rgba(255, 255, 255, .28);
   border: 2px dashed var(--perla); border-radius: 6px; color: var(--perla); font: 700 1.05rem/1 var(--testo); }
 .slot .r { font: 600 .66rem/1 var(--testo); opacity: .85; }
+.slot:not(.conta):not(.fisso) { font-size: 1.5rem; }
+.slot.scelto:not(.conta):not(.fisso) { font-size: .95rem; text-transform: uppercase; letter-spacing: .1em; }
 .slot.scelto { background: var(--tema); border: 2px solid var(--tema); color: var(--su-tema); }
 .slot.fisso { background: var(--accento); border-color: var(--accento); color: #fff; height: 36px; }
 /* IL FONDO DELLA TAZZA: le perle. Gli scarti, su tre file; la terza fila è la bomba e lo dice il rosso */
-.scarti { margin: 0 1.5%; padding: 10px 18px 16px; background: var(--perla); clip-path: polygon(1.5% 0, 98.5% 0, 95% 100%, 5% 100%); }
+/* stessa regola della tazza: il fondo stringe fino al 5% per lato, e le file stanno dentro il 5% + 8 px (prima 18 px fissi: la «3×» usciva a sinistra) */
+.scarti { margin: 0 1.5%; padding: 10px calc(5% + 8px) 16px; background: var(--perla); clip-path: polygon(1.5% 0, 98.5% 0, 95% 100%, 5% 100%); }
 .scarti h3 { color: var(--tenue); }
 .fila { display: flex; gap: 8px; align-items: flex-start; margin-top: 2px; min-height: 26px; }
 .fila .volte { flex: none; min-width: 2em; color: var(--tenue); font: 400 .95rem/26px var(--titolo); white-space: nowrap; }

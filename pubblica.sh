@@ -6,7 +6,8 @@
 #    (index, css e js propri, escluse prova/, dorsi.html e note) + engine.js, demo.js, app.js della radice del gioco.
 #    I pezzi comuni di design/ (comune.css, pezzi.js, copertina.js, vignette.js, fonts/) vanno in comune/,
 #    perché design/ resta fuori da git. I percorsi nella copia sono riscritti qui: i sorgenti non si toccano.
-#  - Altri dieci giochi: la versione attuale, cinque file (index.html app.js demo.js engine.js style.css).
+#  - Altri dieci giochi: la versione attuale, cinque file (index.html app.js demo.js engine.js style.css);
+#    il-lupo in più copione.js, tutorial.js, pezzi.js, vignette.js (il tutorial a pezzetti sta dentro il gioco).
 #  - La pagina d'ingresso è index.html (scritta a mano, non toccata dallo script, solo marcata noindex se serve).
 # Ogni pagina chiede ai motori di ricerca di non indicizzarla: è una prova non annunciata.
 set -euo pipefail
@@ -52,6 +53,8 @@ done
 for g in "${ALTRI[@]}"; do
   mkdir -p "$g"
   for f in "${FILE[@]}"; do cp "../$g/$f" "$g/$f"; done
+  # il-lupo ha il tutorial a pezzetti dentro il gioco (24/10/2026): copione dei testi, pezzi e vignette comuni (copie nella radice del gioco), tutorial.js
+  if [ "$g" = il-lupo ]; then for f in copione.js tutorial.js pezzi.js vignette.js; do cp "../$g/$f" "$g/$f"; done; fi
   noindex "$g/index.html"
   echo "copiato: $g"
 done

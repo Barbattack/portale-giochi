@@ -3,14 +3,19 @@
  * Script di SOLO PROTOTIPO. Legge il DOM che app.js produce e ci aggiunge quello che il disegno vuole; non tocca il motore. Vale in partita
  * e nel tutorial. Si carica dopo engine.js e copione.js, prima di app.js. Erbottega lo porterà dentro app.js (vedi il documento del copione, §5).
  *
- *  1. LO SPAZIO SUI POSTI. Su ogni posto di ogni coda (davanti al più alto, fra due clienti, dietro al più basso) c'è scritto quanti numeri
- *     ci starebbero: fra un 8 e un Asso otto, davanti a un Re uno solo. Nelle code chiuse è un numero piccolo fra due righe (.sp); nella
- *     coda aperta è sul tasto del posto (.slot), grande, con accanto «da quale a quale». È il cuore del ragionamento (Damiano, 23/10).
- *  2. I POSTI SI CHIAMANO «dietro», «davanti», «fra» (le parole della spina), non «sotto» e «sopra»: aria-label dei posti, messaggi.
- *  3. IL MALEDUCATO DICE I NUMERI: «Il 5♠ non sta: qui ci stanno solo i numeri da 8 a Re».
- *  4. RESTA e CACCIALO dicono quanto costano, sotto, piccolo: «la coda se ne va: 3» · «via lui e il prossimo: 2».
+ *  1. LO SPAZIO SUI POSTI — SOLO NEL TUTORIAL. Su ogni posto di ogni coda (davanti al più alto, fra due clienti, dietro al più basso) c'è
+ *     scritto quanti numeri ci starebbero: fra un 8 e un Asso otto, davanti a un Re uno solo. Nelle code chiuse è un numero piccolo fra due
+ *     righe (.sp); nella coda aperta è sul tasto del posto (.slot.conta), grande, con accanto «da quale a quale». È il cuore del ragionamento
+ *     (Damiano, 23/10). IN PARTITA NON C'È (Damiano, 24/10: «nella partita normale NON ci devono stare, altrimenti gioca da solo il gioco e
+ *     non il giocatore che deve un minimo ragionare e fare 2 conti»): niente .sp fra le strisce, e il tasto del posto resta quello di app.js
+ *     («+», e «qui» quando è scelto), con l'aria-label che dice solo dov'è (punto 2). Il tutorial si riconosce dal cartello del passo (.passo).
+ *  2. I POSTI SI CHIAMANO «dietro», «davanti», «fra» (le parole della spina), non «sotto» e «sopra»: aria-label dei posti, messaggi. Ovunque.
+ *  3. IL MALEDUCATO DICE I NUMERI: «Il 5♠ salta la fila: qui ci stanno solo i numeri da 8 a Re». ANCHE IN PARTITA: spiega l'errore
+ *     (Damiano: «ti dice no e ti dice perché»), non suggerisce la mossa.
+ *  4. RESTA e CACCIALO dicono quanto costano, sotto, piccolo: «la coda se ne va: 3» · «via lui e il prossimo: 2» — SOLO NEL TUTORIAL.
+ *     In partita i due tasti sono nudi: quanto costa lo conta il giocatore.
  *  5. Il bancone (il coperchio della tazza) in cima alle code; «clienti» al posto di «carte» sotto i nomi delle code; «Scarti · N» come titolo
- *     degli scarti; il titolo del gioco su tre righe (THE FIRST / BOBA TEA / SHOP IN LONDON).
+ *     degli scarti; il titolo del gioco su tre righe (THE FIRST / BOBA TEA / SHOP IN LONDON). Ovunque.
  */
 (function () {
   'use strict';
@@ -40,7 +45,8 @@
   }
   function etichettaSpazio(l) { var n = spazio(l); return { n: n, r: l[0] === l[1] ? sig(l[0]) : sig(l[0]) + '–' + sig(l[1]) }; }
 
-  function sistemaCoda(coda) {
+  // aiuti = true nel tutorial (i numeri dello spazio, punto 1); false in partita (solo le parole dei posti, punto 2)
+  function sistemaCoda(coda, aiuti) {
     var lista = coda.querySelector('.lista'); if (!lista) return;
     var vals = valori(lista), n = vals.length;
     var slots = q('.slot', lista);
@@ -53,8 +59,10 @@
           return;
         }
         if (sl.getAttribute('data-pos')) return;
-        var l = limiti(vals, p), e = etichettaSpazio(l);
         sl.setAttribute('data-pos', String(p));
+        if (!aiuti) { sl.setAttribute('aria-label', nomePosto(lista, p, false) + ', ' + nomePosto(lista, p, true)); return; }   // in partita: «+» / «qui» di app.js
+        var l = limiti(vals, p), e = etichettaSpazio(l);
+        sl.classList.add('conta');
         sl.textContent = '';
         var b1 = document.createElement('span'); b1.className = 'n'; b1.textContent = String(e.n);
         var b2 = document.createElement('span'); b2.className = 'r'; b2.textContent = e.r;
@@ -63,7 +71,7 @@
       });
       return;
     }
-    if (lista.querySelector('.sp')) return;                   // coda chiusa: i numeri dello spazio fra le strisce
+    if (!aiuti || lista.querySelector('.sp')) return;         // coda chiusa, nel tutorial: i numeri dello spazio fra le strisce
     var s = strisce(lista);
     function sp(p) {
       var l = limiti(vals, p), e = etichettaSpazio(l);
@@ -82,18 +90,19 @@
       var t = h1.textContent.trim(), m = /^(The First) (Boba Tea) (Shop in London)$/.exec(t);
       if (m) { h1.textContent = ''; ['r1', 'r2', 'r3'].forEach(function (c, i) { var s = document.createElement('span'); s.className = c; s.textContent = m[i + 1]; h1.appendChild(s); }); }
     }
+    var aiuti = !!app.querySelector('.passo');   // il tutorial ha il cartello del passo; la partita (anche quella che continua dopo il tutorial) no
     var code = app.querySelector('.code');
     if (code) {
       // il bancone è uno span, non un div: così .coda:nth-of-type conta solo le code
       if (!code.querySelector('.bancone')) { var b = document.createElement('span'); b.className = 'bancone'; b.setAttribute('aria-hidden', 'true'); code.insertBefore(b, code.firstChild); }
-      q('.coda', code).forEach(sistemaCoda);
+      q('.coda', code).forEach(function (c) { sistemaCoda(c, aiuti); });
       q('.testa small', code).forEach(function (s) { var v = s.textContent.replace(/\b1 carta\b/, '1 cliente').replace(/(\d+) carte\b/, '$1 clienti'); if (v !== s.textContent) s.textContent = v; });
     }
     var h3 = app.querySelector('.scarti h3');
     if (h3) { var mm = /^Scarti \((\d+)\)/.exec(h3.textContent); if (mm) h3.textContent = +mm[1] ? 'Scarti · ' + mm[1] : 'Scarti'; }
-    // Resta e Caccialo dicono quanto costano
+    // Resta e Caccialo dicono quanto costano: solo nel tutorial
     var resta = app.querySelector('.azioni .resta'), caccia = app.querySelector('.azioni .caccia');
-    if (resta && !resta.querySelector('small')) {
+    if (aiuti && resta && !resta.querySelector('small')) {
       var cd = app.querySelector('.coda:has(.slot.fisso)'), n = cd ? strisce(cd.querySelector('.lista')).length : 0;
       var num = app.querySelector('.pila .num'), mazzo = num ? +num.textContent : 1;
       var s1 = document.createElement('small'); s1.textContent = C.aiuti.costoResta.replace('{n}', n); resta.appendChild(s1);

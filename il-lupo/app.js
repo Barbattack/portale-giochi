@@ -47,9 +47,13 @@
   }
 
   // ---------- carte ----------
-  function faccia(c, tag, cls) {
+  // di: 'lupo' | 'tu' | 'mazzo' — dice di chi è la carta (serve a chi legge e alla vignetta del tutorial: «Il tuo 7», «Il 7 del Lupo»)
+  function faccia(c, tag, cls, di) {
     var e = el(tag || 'div', 'carta ' + c.seme + (cls ? ' ' + cls : ''));
-    e.setAttribute('aria-label', c.valore + ' ' + L.NOME_SEME[c.seme]);
+    var col = L.NOME_SEME[c.seme];
+    e.setAttribute('aria-label', di === 'lupo' ? 'Il ' + c.valore + ' del Lupo, ' + col : di === 'tu' ? 'Il tuo ' + c.valore + ', ' + col
+      : di === 'mazzo' ? 'La scoperta: ' + c.valore + ' ' + col : c.valore + ' ' + col);
+    e.setAttribute('data-id', c.id);
     e.appendChild(el('span', 'v', String(c.valore)));
     return e;
   }
@@ -64,13 +68,13 @@
     var lupo = el('div', 'lupo');
     if (!o.stato.lupo.length) lupo.appendChild(el('span', 'vuoto', 'Nessuna carta'));
     o.stato.lupo.forEach(function (c) {
-      var b = faccia(c, o.cliccaSua ? 'button' : 'div', o.scelte[c.id] || '');
+      var b = faccia(c, o.cliccaSua ? 'button' : 'div', o.scelte[c.id] || '', 'lupo');
       if (o.cliccaSua) { b.type = 'button'; b.addEventListener('click', function () { o.cliccaSua(c); }); }
       lupo.appendChild(b);
     });
     t.appendChild(lupo);
     var mz = el('div', 'mazzo');
-    if (o.stato.mazzo.length) mz.appendChild(faccia(o.stato.mazzo[0]));
+    if (o.stato.mazzo.length) mz.appendChild(faccia(o.stato.mazzo[0], null, null, 'mazzo'));
     else mz.appendChild(el('div', 'carta vuoto'));
     mz.appendChild(el('div', null, conTesto(o.stato.mazzo.length, 'carta', 'carte') + ' nel mazzo'));
     t.appendChild(mz);
@@ -79,7 +83,7 @@
     box.appendChild(el('div', 'etichetta', 'Le tue carte'));
     var mano = el('div', 'mano');
     o.stato.tu.forEach(function (c) {
-      var b = faccia(c, o.cliccaMia ? 'button' : 'div', o.scelte[c.id] || '');
+      var b = faccia(c, o.cliccaMia ? 'button' : 'div', o.scelte[c.id] || '', 'tu');
       if (o.cliccaMia) { b.type = 'button'; b.addEventListener('click', function () { o.cliccaMia(c); }); }
       mano.appendChild(b);
     });
@@ -207,7 +211,7 @@
   }
 
   // ---------- demo (giocabile: ogni passo con una mossa la fa il giocatore) ----------
-  function vaiDemo() { schermo = 'demo'; demo = { i: 0, st: D.nuova(), sel: null, fatto: false, msg: '', ok: false }; render(); }
+  function vaiDemo() { schermo = 'demo'; demo = { i: 0, st: D.nuova(), sel: null, fatto: false, msg: '', ok: false, errori: 0 }; render(); }
   function valoreDi(id) {
     var tutte = demo.st.tu.concat(demo.st.lupo), k;
     for (k = 0; k < tutte.length; k++) if (tutte[k].id === id) return tutte[k].valore;
@@ -236,17 +240,24 @@
     if (sel.mossa !== (m.t === 'fermati' ? 'fermati' : m.azione)) return 'tocca ' + nome;
     return 'tocca Conferma';
   }
-  function demoSbagliato(m) { demo.msg = 'Non ancora: ' + prossimaCosa(m, demo.sel) + '.'; demo.ok = false; render(); }
-  function demoAvanti() { demo.i++; demo.sel = null; demo.fatto = false; demo.msg = ''; demo.ok = false; render(); }
+  // sbaglio: nel turno guidato il gioco dice cosa toccare; nel turno «trova» non lo dice mai subito, ma aiuta a ragionare (aiuti, uno più chiaro dell'altro)
+  function demoSbagliato(m) {
+    var passo = D.passi[demo.i];
+    if (passo.trova) { demo.errori = (demo.errori || 0) + 1; demo.msg = passo.aiuti[Math.min(demo.errori, passo.aiuti.length) - 1]; }
+    else demo.msg = 'Non ancora: ' + prossimaCosa(m, demo.sel) + '.';
+    demo.ok = false; render();
+  }
+  function demoAvanti() { demo.i++; demo.sel = null; demo.fatto = false; demo.msg = ''; demo.ok = false; demo.errori = 0; render(); }
   function demoConferma(passo) {
     var m = passo.mossa, sel = demo.sel;
+    if (passo.trova && !sel.mie.length && !sel.sue.length && !sel.mossa) { demo.msg = 'Scegli una mossa, poi Conferma.'; demo.ok = false; render(); return; }   // niente scelto: non è uno sbaglio
     if (prossimaCosa(m, sel) !== 'tocca Conferma') { demoSbagliato(m); return; }
     var n = L.apply(demo.st, m);
     demo.fatto = true;
     if (n.rifiuto) { demo.msg = 'Non si può: ' + n.rifiuto; demo.ok = false; render(); return; }
     demo.st = n; demo.ok = true;
     demo.msg = m.t === 'fermati' ? spiegaFine(n.fine) : riassunto(n.ultimo);
-    if (demo.i < D.passi.length - 1) { demo.i++; demo.sel = null; demo.fatto = false; }
+    if (demo.i < D.passi.length - 1) { demo.i++; demo.sel = null; demo.fatto = false; demo.errori = 0; }
     render();
   }
   function schermoDemo() {
@@ -254,19 +265,26 @@
     var fine = !!demo.st.fine;
     app.appendChild(intestazione([bottone('Salta', 'mini', vaiInizio)]));
     if (m && !demo.sel) demo.sel = { mie: [], sue: [], mossa: null };
-    var sel = demo.sel, scelte = {}, aiuto = {}, aiutoMossa = null, pronto = false;
+    var sel = demo.sel, scelte = {}, aiuto = {}, aiutoMossa = null, pronto = false, trova = !!passo.trova;
     if (m && !demo.fatto) {
-      (m.mie || []).concat(m.sue || []).forEach(function (id) { aiuto[id] = 'suggerita'; });
+      // turno «trova»: niente carte né tasto indicati, la mossa la cerca il giocatore (si accende solo ciò che ha già toccato, e Conferma quando è pronta)
+      // guidato: si indica UNA cosa alla volta, nell'ordine del testo (le tue carte, quelle del Lupo, la mossa, Conferma)
+      if (!trova) {
+        var prox = (m.mie || []).filter(function (id) { return sel.mie.indexOf(id) < 0; })[0] || (m.sue || []).filter(function (id) { return sel.sue.indexOf(id) < 0; })[0];
+        if (prox) aiuto[prox] = 'suggerita';
+      }
       sel.mie.concat(sel.sue).forEach(function (id) { aiuto[id] = 'scelta'; });
-      aiutoMossa = m.t === 'fermati' ? 'fermati' : m.azione;
+      // il tasto della mossa si indica finché non è scelto: poi tocca a Conferma (la vignetta segue il primo elemento indicato)
+      var giusta = m.t === 'fermati' ? 'fermati' : m.azione;
+      var restano = !trova && ((m.mie || []).some(function (id) { return sel.mie.indexOf(id) < 0; }) || (m.sue || []).some(function (id) { return sel.sue.indexOf(id) < 0; }));
+      aiutoMossa = trova || restano || sel.mossa === giusta ? null : giusta;
       pronto = prossimaCosa(m, sel) === 'tocca Conferma';
     } else if (m && demo.fatto) {   // rifiuto fatto: le carte restano segnate in rosso
       (m.mie || []).concat(m.sue || []).forEach(function (id) { aiuto[id] = 'no'; });
     }
     msg = demo.msg; msgOk = demo.ok;
-    var p = el('div', 'punti');
-    p.appendChild(el('span', null, 'Demo: passo ' + (demo.i + 1) + ' di ' + D.passi.length));
-    app.appendChild(p);
+    app.appendChild(punteggio(demo.st));
+    app.appendChild(el('div', 'etichetta contapassi', 'Tutorial: passo ' + (demo.i + 1) + ' di ' + D.passi.length));
     var attivo = m && !demo.fatto && !fine;
     app.appendChild(tavolo({
       stato: demo.st, scelte: aiuto, mossa: attivo ? sel.mossa : (m && demo.fatto && !fine ? (m.t === 'fermati' ? 'fermati' : m.azione) : null),
@@ -275,12 +293,13 @@
       cliccaSua: attivo ? function (c) { demoCarta(m, sel.sue, c.id, (m.sue || [])); } : null,
       cliccaMossa: attivo ? function (x) {
         var giusta = m.t === 'fermati' ? 'fermati' : m.azione;
-        if (x !== giusta) { demoSbagliato(m); return; }
+        if (x !== giusta && !trova) { demoSbagliato(m); return; }
         sel.mossa = sel.mossa === x ? null : x; demo.msg = ''; demo.ok = false; render();
       } : null
     }));
     var box = el('div', 'passo');
-    if (m && !demo.fatto) box.appendChild(el('b', 'istruzione', frase(m) + '.'));
+    box.setAttribute('data-passo', String(demo.i));
+    if (m && !demo.fatto && !trova) box.appendChild(el('b', 'istruzione', frase(m) + '.'));
     box.appendChild(document.createTextNode(passo.testo));
     app.appendChild(box);
     var az = el('div', 'azioni');
@@ -289,14 +308,16 @@
     } else if (m && !demo.fatto) {
       /* mano finita prima del tempo: non succede con la mano preparata */
     } else if (ultimo && (!m || demo.fatto)) {
-      az.appendChild(bottone('Gioca', 'conferma', vaiInizio));
+      az.appendChild(bottone('Continua', 'conferma', continuaPartita));
     } else {
       az.appendChild(bottone('Avanti', 'conferma', demoAvanti));
     }
     app.appendChild(az);
   }
+  // finito il tutorial la partita CONTINUA: è la stessa, nello stato in cui il tutorial l'ha lasciata (la mano è chiusa, si passa alla prossima)
+  function continuaPartita() { g = demo.st; azzera(); msg = ''; msgOk = false; schermo = 'partita'; render(); }
   function demoCarta(m, lista, id, giuste) {
-    if (giuste.indexOf(id) < 0) { demoSbagliato(m); return; }
+    if (giuste.indexOf(id) < 0 && !(D.passi[demo.i] && D.passi[demo.i].trova)) { demoSbagliato(m); return; }   // nel turno «trova» si guarda e si prova liberamente
     var i = lista.indexOf(id);
     if (i >= 0) lista.splice(i, 1); else lista.push(id);
     demo.msg = ''; demo.ok = false; render();
