@@ -27,10 +27,12 @@
     if (k === 'lupo') return q('.lupo .carta');
     if (k === 'tue') return q('.mano .carta');
     if (k === 'mazzo') return q('.mazzo');
-    if (k === 'mosse') return q('.mosse');
+    if (k === 'striscia') return q('.striscia');
+    if ((m = /^regola:(.+)$/.exec(k))) return q('.regola').filter(function (x) { return x.getAttribute('data-az') === m[1].toLowerCase(); });
+    if (k === 'azione') return q('.mosse .unica');
     if (k === 'punti') return q('.punti');
     if ((m = /^carta:(\w+)$/.exec(k))) return q('.carta[data-id="' + m[1] + '"]');
-    if ((m = /^tasto:(.+)$/.exec(k))) return q('.mosse button').filter(function (x) { return primoTesto(x) === m[1]; });
+    if ((m = /^tasto:(.+)$/.exec(k))) return q('.mosse button').filter(function (x) { return primoTesto(x) === m[1]; });   // solo Fermati: le altre mosse stanno nella striscia (regola:Nome)
     return [];
   }
 

@@ -14,10 +14,9 @@
     link: 'https://boardgamegeek.com/boardgame/368675/lobo'
   };
 
-  var MOSSE = ['perfetta', 'somma', 'divisa', 'sopra', 'fermati'];   // la legenda del tutorial (nella partita compaiono solo le mosse possibili)
   var schermo;       // 'domanda' | 'inizio' | 'partita' | 'demo'
   var g;             // stato del motore
-  var sel;           // { mie:[id], sue:[id], mossa (Sopra/Divisa in attesa delle carte del Lupo), chiedi (la domanda «Ti fermi?» è aperta) }
+  var sel;           // { mie:[id], sue:[id], chiedi (la domanda «Ti fermi?» è aperta) }
   var msg, msgOk;
   var demo;          // { i, st }
 
@@ -51,16 +50,18 @@
   function faccia(c, tag, cls, di) {
     var e = el(tag || 'div', 'carta ' + c.seme + (cls ? ' ' + cls : ''));
     var col = L.NOME_SEME[c.seme];
-    e.setAttribute('aria-label', di === 'lupo' ? 'Il ' + c.valore + ' del Lupo, ' + col : di === 'tu' ? 'Il tuo ' + c.valore + ', ' + col
+    e.setAttribute('aria-label', di === 'lupo' ? il(c.valore).replace(/^./, function (x) { return x.toUpperCase(); }) + ' del Lupo, ' + col : di === 'tu' ? 'Il tuo ' + c.valore + ', ' + col
       : di === 'mazzo' ? 'La scoperta: ' + c.valore + ' ' + col : c.valore + ' ' + col);
     e.setAttribute('data-id', c.id);
     e.appendChild(el('span', 'v', String(c.valore)));
     return e;
   }
+  // «l'» davanti a 1 e 8 (l'1, l'8), «il» davanti agli altri (carte da 1 a 10); con «tuo» l'articolo non cambia
+  function il(n) { return n === 1 || n === 8 ? 'l\u2019' + n : 'il ' + n; }
   function conTesto(n, uno, molti) { return n + ' ' + (n === 1 ? uno : molti); }
 
   // ---------- tavolo (partita e demo) ----------
-  /* o: { stato, scelte:{id:classe}, cliccaMia(c), cliccaSua(c), pulsanti:[{azione, on, suggerita, click}], domanda:{punti, si, no, siSuggerita} | null } */
+  /* o: { stato, scelte:{id:classe}, cliccaMia(c), cliccaSua(c), unica:{testo, nome, attiva, suggerita, click} | null, fermati(), fermatiSuggerita, mosse:false (nasconde tasto e Fermati), forma (la mossa che la scelta forma), domanda:{punti, si, no} | null } */
   function tavolo(o) {
     var box = el('div');
     box.appendChild(el('div', 'etichetta', 'Mano del Lupo (' + o.stato.lupo.length + ')'));
@@ -91,19 +92,41 @@
     if (o.domanda) {   // «Ti fermi?»: l'unica mossa con una domanda
       var dom = el('div', 'mosse domanda');
       dom.appendChild(el('div', 'quesito', 'Ti fermi? Il Lupo segna ' + conTesto(o.domanda.punti, 'punto', 'punti')));
-      dom.appendChild(bottone('Sì', 'si' + (o.domanda.siSuggerita ? ' suggerita' : ''), o.domanda.si));
+      dom.appendChild(bottone('Sì', 'si', o.domanda.si));
       dom.appendChild(bottone('No', 'no', o.domanda.no));
       box.appendChild(dom);
-      return box;
+    } else if (o.mosse !== false) {
+      // un tasto solo, che dice cosa succede con la scelta fatta (spento, col motivo, se la scelta non vale), e Fermati sempre
+      var mosse = el('div', 'mosse');
+      if (o.unica) {
+        var u = bottone(o.unica.testo, 'unica' + (o.unica.attiva ? '' : ' spenta') + (o.unica.suggerita ? ' suggerita' : ''), o.unica.attiva ? o.unica.click : null);
+        if (!o.unica.attiva) { u.disabled = true; u.setAttribute('data-motivo', '1'); }
+        else u.setAttribute('data-vignetta', o.unica.nome);
+        mosse.appendChild(u);
+      }
+      var f = bottone('Fermati', 'ferma' + (o.fermatiSuggerita ? ' suggerita' : ''), o.fermati || null);
+      if (!o.fermati) f.tabIndex = -1;
+      mosse.appendChild(f);
+      box.appendChild(mosse);
     }
-    var mosse = el('div', 'mosse');
-    (o.pulsanti || []).forEach(function (p) {
-      var b = bottone(L.NOME_AZIONE[p.azione], (p.azione === 'fermati' ? 'ferma ' : '') + (p.on ? 'on ' : '') + (p.suggerita ? 'suggerita' : ''), p.click ? function () { p.click(p.azione); } : null);
-      if (!p.click) b.tabIndex = -1;
-      mosse.appendChild(b);
-    });
-    box.appendChild(mosse);
+    box.appendChild(striscia(o.forma));
     return box;
+  }
+  // La striscia delle mosse: il cartoncino delle regole, sempre uguale. NON guarda le carte: si accende solo la casellina della mossa che la scelta sta formando.
+  var REGOLE = [
+    ['perfetta', 'una tua uguale a una sua, peschi tu'], ['somma', 'più tue fanno una sua, peschi tu'],
+    ['divisa', 'più sue fanno una tua, il Lupo pesca 1'], ['sopra', 'una tua più alta, il Lupo pesca la differenza']
+  ];
+  function striscia(forma) {
+    var st = el('div', 'striscia');
+    REGOLE.forEach(function (r) {
+      var c = el('div', 'regola' + (forma === r[0] ? ' forma' : ''));
+      c.setAttribute('data-az', r[0]);
+      c.appendChild(el('b', null, L.NOME_AZIONE[r[0]]));
+      c.appendChild(el('span', null, r[1]));
+      st.appendChild(c);
+    });
+    return st;
   }
 
   function punteggio(st) {
@@ -151,7 +174,7 @@
     g = L.nuova(semeIniziale(), { livello: livello });
     azzera(); schermo = 'partita'; manoNuova(); render();
   }
-  function azzera() { sel = { mie: [], sue: [], mossa: null, chiedi: false }; }
+  function azzera() { sel = { mie: [], sue: [], chiedi: false }; }
   function manoNuova() {
     msgOk = false;
     msg = g.ultimo && g.ultimo.rimescolato ? 'Mazzo rimescolato.' : '';
@@ -159,37 +182,37 @@
   }
   function avvisoSenzaMosse() { if (g.senzaMosse && !g.fine) { msg = 'Non hai nessuna mossa possibile: devi fermarti.'; msgOk = false; } }
 
-  // ---------- le mosse con le carte scelte (tutto il conto sta in Lupo.mossePossibili) ----------
-  function opzioniDi(stato, s) { return L.mossePossibili(stato.tu, stato.lupo, s.mie); }
-  // le carte del Lupo da toccare, se Sopra o Divisa aspettano la scelta
-  function bersagliDi(stato, s) {
-    if (!s.mossa) return [];
-    var o = opzioniDi(stato, s).filter(function (x) { return x.azione === s.mossa && !x.diretta; })[0];
-    return o ? o.bersagli : [];
-  }
-  function pulsantiDi(stato, s, click) {
-    var r = opzioniDi(stato, s).map(function (o) { return { azione: o.azione, on: s.mossa === o.azione, click: click }; });
-    r.push({ azione: 'fermati', click: click });
-    return r;
-  }
-  function classiCarte(stato, s) {
+  // ---------- la scelta: carte tue e carte del Lupo, in qualsiasi ordine; la mossa la deduce il gioco (Lupo.leggiScelta) ----------
+  function lettura(stato, s) { return L.leggiScelta(stato.tu, stato.lupo, s.mie, s.sue); }
+  function classiCarte(s) {
     var scelte = {};
-    bersagliDi(stato, s).forEach(function (id) { scelte[id] = 'bersaglio'; });
     s.mie.concat(s.sue).forEach(function (id) { scelte[id] = 'scelta'; });
     return scelte;
   }
-  // toccando una tua carta la scelta cambia: la mossa a metà e la domanda «Ti fermi?» cadono
-  function cambiaScelta(s, id) {
-    var i = s.mie.indexOf(id);
-    if (i >= 0) s.mie.splice(i, 1); else s.mie.push(id);
-    s.sue = []; s.mossa = null; s.chiedi = false;
+  // toccare una carta (tua o del Lupo) la sceglie, toccarla di nuovo la toglie; la domanda «Ti fermi?» cade
+  function alternaCarta(s, lista, id) {
+    var i = lista.indexOf(id);
+    if (i >= 0) lista.splice(i, 1); else lista.push(id);
+    s.chiedi = false;
+  }
+  // cosa dice il tasto: la mossa e chi pesca (la carta scoperta in cima al mazzo è la prossima a uscire), oppure perché la scelta non vale
+  function etichetta(stato, r) {
+    var cima = stato.mazzo[0], carta = cima ? il(cima.valore) : 'una carta';
+    if (r.azione === 'perfetta') return 'Perfetta: peschi ' + carta;
+    if (r.azione === 'somma') return 'Somma: peschi ' + carta;
+    if (r.azione === 'divisa') return 'Divisa: il Lupo pesca ' + carta;
+    return 'Sopra: il Lupo pesca ' + conTesto(r.quante, 'carta', 'carte');
+  }
+  // il tasto unico: assente finché non c'è almeno una carta per parte; poi acceso (la mossa) o spento (il perché)
+  function unicaDi(stato, s, click) {
+    if (s.chiedi || !s.mie.length || !s.sue.length) return null;
+    var r = lettura(stato, s);
+    if (r.azione) return { testo: etichetta(stato, r), nome: L.NOME_AZIONE[r.azione], attiva: true, click: click };
+    return { testo: r.perche, attiva: false };
   }
   function guida(stato, s) {
     if (stato.senzaMosse) return 'Non hai nessuna mossa possibile: devi fermarti.';
-    if (s.mossa === 'sopra') return 'Sopra: tocca la carta del Lupo da togliere.';
-    if (s.mossa === 'divisa') return 'Divisa: tocca le carte del Lupo che insieme fanno ' + stato.tu.filter(function (c) { return c.id === s.mie[0]; })[0].valore + '.';
-    if (!s.mie.length) return 'Tocca una o più carte tue.';
-    if (!opzioniDi(stato, s).length) return 'Con queste carte non c’è nessuna mossa.';
+    if (!s.mie.length || !s.sue.length) return 'Tocca le carte che vuoi usare, tue e del Lupo.';
     return '';
   }
 
@@ -199,36 +222,21 @@
     app.appendChild(punteggio(g));
     var fine = !!g.fine;
     if (!fine && !msg) { msg = guida(g, sel); msgOk = false; }
-    var bers = fine ? [] : bersagliDi(g, sel);
     app.appendChild(tavolo({
-      stato: g, scelte: classiCarte(g, sel),
-      cliccaMia: fine ? null : function (c) { cambiaScelta(sel, c.id); msg = ''; msgOk = false; render(); },
-      cliccaSua: bers.length ? function (c) { toccaSua(c.id); } : null,
-      pulsanti: fine ? [] : pulsantiDi(g, sel, tocca),
+      stato: g, scelte: classiCarte(sel), mosse: !fine,
+      cliccaMia: fine ? null : function (c) { alternaCarta(sel, sel.mie, c.id); msg = ''; msgOk = false; render(); },
+      cliccaSua: fine ? null : function (c) { alternaCarta(sel, sel.sue, c.id); msg = ''; msgOk = false; render(); },
+      unica: fine ? null : unicaDi(g, sel, giocaScelta),
+      forma: fine ? null : lettura(g, sel).azione,
+      fermati: function () { sel.chiedi = true; msg = ''; render(); },
       domanda: !fine && sel.chiedi ? { punti: L.somma(g.lupo), si: fermati, no: function () { sel.chiedi = false; msg = ''; render(); } } : null
     }));
     if (fine) { finale(); return; }
   }
-  // un tocco su una mossa: se è fatta così com'è parte subito, se serve una scelta si accendono le carte del Lupo
-  function tocca(azione) {
-    msg = ''; msgOk = false;
-    if (azione === 'fermati') { sel.chiedi = true; sel.mossa = null; sel.sue = []; render(); return; }
-    var o = opzioniDi(g, sel).filter(function (x) { return x.azione === azione; })[0];
-    if (!o) { render(); return; }
-    if (o.diretta) { gioca(azione, sel.mie, o.sue); return; }
-    sel.mossa = azione; sel.sue = []; render();
-  }
-  function toccaSua(id) {
-    var i = sel.sue.indexOf(id);
-    if (i >= 0) sel.sue.splice(i, 1); else sel.sue.push(id);
-    msg = ''; msgOk = false;
-    if (L.sceltaCompleta(sel.mossa, g.tu, g.lupo, sel.mie, sel.sue)) { gioca(sel.mossa, sel.mie, sel.sue); return; }
-    if (sel.mossa === 'divisa') {
-      var tot = g.lupo.filter(function (c) { return sel.sue.indexOf(c.id) >= 0; }).reduce(function (t, c) { return t + c.valore; }, 0);
-      var mia = g.tu.filter(function (c) { return c.id === sel.mie[0]; })[0].valore;
-      if (tot > mia) msg = 'Le carte che hai toccato fanno ' + tot + ', più del tuo ' + mia + ': toccane una di nuovo per lasciarla.';
-    }
-    render();
+  function giocaScelta() {
+    var r = lettura(g, sel);
+    if (!r.azione) return;
+    eseguiPartita({ t: 'gioca', azione: r.azione, mie: sel.mie.slice(), sue: sel.sue.slice() });
   }
   function riassunto(u) {
     var dove = function (cs) { return cs.map(function (c) { return c.valore; }).join(' + '); };
@@ -245,7 +253,6 @@
     if (g.senzaMosse) { msg += ' Non hai nessuna mossa possibile: devi fermarti.'; }
     render();
   }
-  function gioca(azione, mie, sue) { eseguiPartita({ t: 'gioca', azione: azione, mie: mie.slice(), sue: sue.slice() }); }
   function fermati() { eseguiPartita({ t: 'fermati' }); }
   function spiegaFine(f) {
     if (f.motivo === 'lupo-vuoto') return 'Il Lupo è senza carte: segni ' + conTesto(f.punti, 'punto', 'punti') + '.';
@@ -267,29 +274,28 @@
 
   // ---------- demo (giocabile: ogni passo con una mossa la fa il giocatore, coi tocchi veri della partita) ----------
   function vaiDemo() { schermo = 'demo'; demo = { i: 0, st: D.nuova(), sel: null, fatto: false, msg: '', ok: false, errori: 0 }; render(); }
-  function selVuota() { return { mie: [], sue: [], mossa: null, chiedi: false }; }
+  function selVuota() { return { mie: [], sue: [], chiedi: false }; }
   function valoreDi(id) {
     var tutte = demo.st.tu.concat(demo.st.lupo), k;
     for (k = 0; k < tutte.length; k++) if (tutte[k].id === id) return tutte[k].valore;
     return id;
   }
   function azioneDi(m) { return m.t === 'fermati' ? 'fermati' : m.azione; }
-  // la prossima cosa che manca da toccare: { k:'mia'|'sua'|'mossa'|'si'|'fatto', id|az }
+  // la prossima cosa che manca da toccare: { k:'mia'|'sua'|'unica'|'fermati'|'si', id }
   function prossimo(m, sel) {
-    var k, id, az = azioneDi(m);
+    var k, id;
     for (k = 0; k < (m.mie || []).length; k++) { id = m.mie[k]; if (sel.mie.indexOf(id) < 0) return { k: 'mia', id: id }; }
-    if (az === 'fermati') return sel.chiedi ? { k: 'si' } : { k: 'mossa', az: az };
-    if (sel.mossa !== az) return { k: 'mossa', az: az };
     for (k = 0; k < (m.sue || []).length; k++) { id = m.sue[k]; if (sel.sue.indexOf(id) < 0) return { k: 'sua', id: id }; }
-    return { k: 'fatto' };
+    if (m.t === 'fermati') return sel.chiedi ? { k: 'si' } : { k: 'fermati' };
+    return { k: 'unica' };
   }
   function prossimaCosa(m, sel) {
     var p = prossimo(m, sel);
     if (p.k === 'mia') return 'tocca il tuo ' + valoreDi(p.id);
-    if (p.k === 'sua') return 'tocca il ' + valoreDi(p.id) + ' del Lupo';
-    if (p.k === 'mossa') return 'tocca ' + L.NOME_AZIONE[p.az];
+    if (p.k === 'sua') return 'tocca ' + il(valoreDi(p.id)) + ' del Lupo';
+    if (p.k === 'fermati') return 'tocca Fermati';
     if (p.k === 'si') return 'tocca Sì';
-    return 'tocca la carta giusta';
+    return 'tocca il tasto della mossa, qui sotto';
   }
   // sbaglio: nel turno guidato il gioco dice cosa toccare; nel turno «trova» non lo dice mai subito, ma aiuta a ragionare (aiuti, uno più chiaro dell'altro)
   function demoSbagliato(m) {
@@ -317,29 +323,16 @@
     if (demo.i < D.passi.length - 1) { demo.i++; demo.sel = null; demo.fatto = false; demo.errori = 0; }
     render();
   }
-  function demoMossa(passo, x) {
-    var m = passo.mossa, sel = demo.sel;
-    if (x !== azioneDi(m) && !passo.trova) { demoSbagliato(m); return; }
-    demo.msg = ''; demo.ok = false;
-    if (x === 'fermati') { sel.chiedi = true; sel.mossa = null; sel.sue = []; render(); return; }
-    var o = opzioniDi(demo.st, sel).filter(function (y) { return y.azione === x; })[0];
-    if (!o) { demoSbagliato(m); return; }
-    if (o.diretta) { demoGioca(passo, { t: 'gioca', azione: x, mie: sel.mie.slice(), sue: o.sue }); return; }
-    sel.mossa = x; sel.sue = []; render();
+  function demoUnica(passo) {
+    var r = lettura(demo.st, demo.sel);
+    if (!r.azione) return;
+    demoGioca(passo, { t: 'gioca', azione: r.azione, mie: demo.sel.mie.slice(), sue: demo.sel.sue.slice() });
   }
-  function demoSua(passo, id) {
+  // una carta: nel turno guidato solo quelle della mossa; nel turno «trova» si guarda e si prova liberamente
+  function demoCarta(passo, id, lato) {
     var m = passo.mossa, sel = demo.sel;
-    if (!passo.trova && (m.sue || []).indexOf(id) < 0) { demoSbagliato(m); return; }
-    var i = sel.sue.indexOf(id);
-    if (i >= 0) sel.sue.splice(i, 1); else sel.sue.push(id);
-    demo.msg = ''; demo.ok = false;
-    if (L.sceltaCompleta(sel.mossa, demo.st.tu, demo.st.lupo, sel.mie, sel.sue)) { demoGioca(passo, { t: 'gioca', azione: sel.mossa, mie: sel.mie.slice(), sue: sel.sue.slice() }); return; }
-    render();
-  }
-  function demoCarta(passo, id) {
-    var m = passo.mossa, sel = demo.sel;
-    if ((m.mie || []).indexOf(id) < 0 && !passo.trova) { demoSbagliato(m); return; }   // nel turno «trova» si guarda e si prova liberamente
-    cambiaScelta(sel, id);
+    if (!passo.trova && (m[lato] || []).indexOf(id) < 0) { demoSbagliato(m); return; }
+    alternaCarta(sel, sel[lato], id);
     demo.msg = ''; demo.ok = false; render();
   }
   function schermoDemo() {
@@ -347,29 +340,35 @@
     var fine = !!demo.st.fine;
     app.appendChild(intestazione([bottone('Salta', 'mini', vaiInizio)]));
     if (m && !demo.sel) demo.sel = selVuota();
-    var sel = demo.sel, aiuto = {}, aiutoMossa = null, trova = !!passo.trova;
+    var sel = demo.sel, aiuto = {}, unica = null, forma = null, fermatiSugg = false, trova = !!passo.trova;
     var attivo = !!m && !demo.fatto && !fine;
     if (attivo) {
-      aiuto = classiCarte(demo.st, sel);
-      // turno «trova»: niente carte né tasto indicati, la mossa la cerca il giocatore (si accende solo ciò che ha già toccato).
-      // guidato: si indica UNA cosa alla volta, nell'ordine del testo (le tue carte, la mossa, le carte del Lupo se serve sceglierle, Sì)
-      var p = prossimo(m, sel);
+      aiuto = classiCarte(sel);
+      forma = lettura(demo.st, sel).azione;
+      unica = unicaDi(demo.st, sel, function () { demoUnica(passo); });
+      // turno «trova»: niente indicato, la mossa la cerca il giocatore (si accende solo ciò che ha già toccato).
+      // guidato: si indica UNA cosa alla volta, nell'ordine: le tue carte, quelle del Lupo, il tasto che compare. «Sì» non si indica mai:
+      // la vignetta starebbe sopra la domanda «Ti fermi? Il Lupo segna N punti» e ne coprirebbe metà.
       if (!trova) {
+        var p = prossimo(m, sel);
         if (p.k === 'mia' || p.k === 'sua') aiuto[p.id] = 'suggerita';
-        else if (p.k === 'mossa') aiutoMossa = p.az;
+        else if (p.k === 'unica' && unica && unica.attiva) unica.suggerita = true;
+        else if (p.k === 'fermati') fermatiSugg = true;
       }
-      // «Sì» non si indica mai: la vignetta starebbe sopra la domanda «Ti fermi? Il Lupo segna N punti» e ne coprirebbe metà
     }
     msg = demo.msg; msgOk = demo.ok;
     app.appendChild(punteggio(demo.st));
     app.appendChild(el('div', 'etichetta contapassi', 'Tutorial: passo ' + (demo.i + 1) + ' di ' + D.passi.length));
-    var pulsanti = attivo ? pulsantiDi(demo.st, sel, function (x) { demoMossa(passo, x); }).map(function (b) { b.suggerita = b.azione === aiutoMossa; return b; })
-      : MOSSE.map(function (x) { return { azione: x }; });   // passo da leggere: la fila di tutte le mosse, solo da guardare
     app.appendChild(tavolo({
-      stato: demo.st, scelte: aiuto, pulsanti: pulsanti,
-      cliccaMia: attivo ? function (c) { demoCarta(passo, c.id); } : null,
-      cliccaSua: attivo && bersagliDi(demo.st, sel).length ? function (c) { demoSua(passo, c.id); } : null,
-      domanda: attivo && sel.chiedi ? { punti: L.somma(demo.st.lupo), siSuggerita: false,
+      stato: demo.st, scelte: aiuto, unica: unica, forma: forma, fermatiSuggerita: fermatiSugg,
+      fermati: attivo ? function () {
+        demo.msg = ''; demo.ok = false;
+        if (!trova && azioneDi(m) !== 'fermati') { demoSbagliato(m); return; }
+        sel.chiedi = true; render();
+      } : null,
+      cliccaMia: attivo ? function (c) { demoCarta(passo, c.id, 'mie'); } : null,
+      cliccaSua: attivo ? function (c) { demoCarta(passo, c.id, 'sue'); } : null,
+      domanda: attivo && sel.chiedi ? { punti: L.somma(demo.st.lupo),
         si: function () { demoGioca(passo, { t: 'fermati' }); }, no: function () { sel.chiedi = false; demo.msg = ''; render(); } } : null
     }));
     var box = el('div', 'passo');

@@ -126,79 +126,50 @@
     return tu.some(function (c) { return dp[c.valore] === 2; });
   }
 
-  // ---------- quali mosse si possono fare con le carte scelte ----------
+  // ---------- che mossa forma questa scelta ----------
   /*
-   * mossePossibili(tu, lupo, mieIds) — pura: cosa si può fare con QUESTE carte tue (le carte del Lupo le sceglie il gioco quando può).
-   * Restituisce un elenco, nell'ordine Perfetta, Somma, Divisa, Sopra, di:
-   *   { azione, diretta:true,  sue:[id] }       un tocco e la mossa è fatta (sue = le carte del Lupo da usare; il seme non conta mai,
-   *                                              se ce ne sono due uguali ne va bene una qualsiasi)
-   *   { azione, diretta:false, bersagli:[id] }  la scelta conta: bersagli = le carte del Lupo che si possono toccare
-   * Perfetta: 1 carta tua, una uguale del Lupo. Somma: 2+ carte tue, il totale è una carta del Lupo. Sopra: 1 carta tua; diretta se
-   * il Lupo ha carte più basse tutte dello stesso valore, altrimenti si sceglie (la differenza è quanto pesca il Lupo). Divisa: 1 carta
-   * tua; diretta se c'è un solo modo (stessi valori) di fare il totale con 2+ carte del Lupo, altrimenti bersagli = le carte che entrano
-   * in almeno un totale giusto. Fermati non c'è: è sempre possibile. Carte non trovate o ripetute: nessuna mossa.
+   * leggiScelta(tu, lupo, mieIds, sueIds) — pura. Il giocatore sceglie carte sue e carte del Lupo, in qualsiasi ordine; la mossa la deduce il gioco:
+   *   1 tua + 1 sua, uguali            → perfetta   (peschi tu, 1 carta)
+   *   1 tua + 1 sua, la tua più alta   → sopra      (pesca il Lupo, la differenza)
+   *   2+ tue + 1 sua, il totale è la sua → somma    (peschi tu, 1 carta)
+   *   1 tua + 2+ sue, il totale è la tua → divisa   (pesca il Lupo, 1 carta)
+   * Restituisce { azione, chi, quante, perche }:
+   *   scelta valida:      azione = la mossa, chi/quante = chi pesca e quante carte, perche = null
+   *   scelta non valida:  azione = null, perche = in poche parole cosa non torna (mai cosa toccare, mai la mossa giusta)
+   *   niente da dire (nessuna carta, o carte solo da una parte, o carte non trovate): azione = null, perche = null
+   * Il seme non conta mai. Non guarda quali mosse esistono sul tavolo: legge solo la scelta.
    */
-  function mossePossibili(tu, lupo, mieIds) {
-    var mie = [], visti = {}, i, out = [];
-    for (i = 0; i < (mieIds || []).length; i++) {
-      var c = tu.filter(function (x) { return x.id === mieIds[i]; })[0];
-      if (!c || visti[c.id]) return [];
-      visti[c.id] = true; mie.push(c);
-    }
-    if (!mie.length) return out;
-    var tot = somma(mie), uguali;
-    if (mie.length === 1) {
-      uguali = lupo.filter(function (x) { return x.valore === tot; });
-      if (uguali.length) out.push({ azione: 'perfetta', diretta: true, sue: [uguali[0].id] });
-    } else {
-      uguali = lupo.filter(function (x) { return x.valore === tot; });
-      if (uguali.length) out.push({ azione: 'somma', diretta: true, sue: [uguali[0].id] });
-    }
-    if (mie.length === 1) {
-      var modi = modiDivisa(lupo, tot);
-      if (modi.length) {
-        var chiavi = {}, unione = [], visto = {};
-        modi.forEach(function (m) {
-          chiavi[m.map(function (k) { return lupo[k].valore; }).sort().join('+')] = true;
-          m.forEach(function (k) { if (!visto[lupo[k].id]) { visto[lupo[k].id] = true; unione.push(lupo[k].id); } });
-        });
-        if (Object.keys(chiavi).length === 1) out.push({ azione: 'divisa', diretta: true, sue: modi[0].map(function (k) { return lupo[k].id; }) });
-        else out.push({ azione: 'divisa', diretta: false, bersagli: unione });
+  function leggiScelta(tu, lupo, mieIds, sueIds) {
+    var vuoto = { azione: null, chi: null, quante: 0, perche: null };
+    function prendi(ids, mano) {
+      var out = [], visti = {};
+      for (var i = 0; i < (ids || []).length; i++) {
+        var c = mano.filter(function (x) { return x.id === ids[i]; })[0];
+        if (!c || visti[c.id]) return null;
+        visti[c.id] = true; out.push(c);
       }
-      var piu = lupo.filter(function (x) { return x.valore < tot; });
-      if (piu.length) {
-        var vals = {}; piu.forEach(function (x) { vals[x.valore] = true; });
-        if (Object.keys(vals).length === 1) out.push({ azione: 'sopra', diretta: true, sue: [piu[0].id] });
-        else out.push({ azione: 'sopra', diretta: false, bersagli: piu.map(function (x) { return x.id; }) });
-      }
+      return out;
     }
-    return out;
-  }
-  // tutti i gruppi di 2+ carte del Lupo (indici) che fanno esattamente `totale`
-  function modiDivisa(lupo, totale) {
-    var modi = [];
-    (function vai(da, scelte, resto) {
-      if (scelte.length >= 2 && resto === 0) { modi.push(scelte.slice()); return; }
-      for (var k = da; k < lupo.length; k++) {
-        if (lupo[k].valore > resto) continue;
-        scelte.push(k); vai(k + 1, scelte, resto - lupo[k].valore); scelte.pop();
-      }
-    }(0, [], totale));
-    return modi;
-  }
-  // La scelta in due tempi è completa? Sopra: una carta del Lupo tra i bersagli. Divisa: carte del Lupo (2+) che fanno il valore della carta tua.
-  function sceltaCompleta(azione, tu, lupo, mieIds, sueIds) {
-    var op = mossePossibili(tu, lupo, mieIds).filter(function (o) { return o.azione === azione && !o.diretta; })[0];
-    if (!op || !sueIds || !sueIds.length) return false;
-    var sue = [];
-    for (var i = 0; i < sueIds.length; i++) {
-      var c = lupo.filter(function (x) { return x.id === sueIds[i]; })[0];
-      if (!c || sue.indexOf(c) >= 0 || op.bersagli.indexOf(c.id) < 0) return false;
-      sue.push(c);
+    var mie = prendi(mieIds, tu), sue = prendi(sueIds, lupo);
+    if (!mie || !sue || !mie.length || !sue.length) return vuoto;
+    function no(t) { return { azione: null, chi: null, quante: 0, perche: t }; }
+    function si(az, chi, n) { return { azione: az, chi: chi, quante: n, perche: null }; }
+    if (mie.length === 1 && sue.length === 1) {
+      if (mie[0].valore === sue[0].valore) return si('perfetta', 'tu', 1);
+      if (mie[0].valore > sue[0].valore) return si('sopra', 'lupo', mie[0].valore - sue[0].valore);
+      return no('La carta del Lupo è un ' + sue[0].valore + ', più alta del tuo ' + mie[0].valore + '.');
     }
-    var mia = tu.filter(function (x) { return x.id === mieIds[0]; })[0];
-    if (azione === 'sopra') return sue.length === 1;
-    return sue.length >= 2 && somma(sue) === mia.valore;
+    if (sue.length === 1) {                                   // 2+ tue contro una sua
+      var t = somma(mie);
+      if (t === sue[0].valore) return si('somma', 'tu', 1);
+      return no('Le tue carte fanno ' + t + ', quella del Lupo è un ' + sue[0].valore + '.');
+    }
+    if (mie.length === 1) {                                   // una tua contro 2+ sue
+      var u = somma(sue);
+      if (u === mie[0].valore) return si('divisa', 'lupo', 1);
+      return no('Le carte del Lupo fanno ' + u + ', la tua è un ' + mie[0].valore + '.');
+    }
+    return no('Nessuna mossa usa più carte per parte.');
   }
   function aggiornaMosse(s) { s.senzaMosse = !s.fine && !ciSonoMosse(s.tu, s.lupo); }
 
@@ -333,7 +304,7 @@
   }
 
   return {
-    nuova: nuova, apply: apply, carta: carta, daId: daId, somma: somma, ciSonoMosse: ciSonoMosse, mossePossibili: mossePossibili, sceltaCompleta: sceltaCompleta,
+    nuova: nuova, apply: apply, carta: carta, daId: daId, somma: somma, ciSonoMosse: ciSonoMosse, leggiScelta: leggiScelta,
     mazzoCompleto: mazzoCompleto, TRAGUARDO: TRAGUARDO, MANO: MANO, LIVELLI: LIVELLI,
     SEMI: SEMI, NOME_SEME: NOME_SEME, NOME_AZIONE: NOME_AZIONE
   };

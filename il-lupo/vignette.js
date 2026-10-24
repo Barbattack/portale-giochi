@@ -20,6 +20,8 @@
   function testoPulito(s) { return (s || '').replace(/\s+/g, ' ').trim(); }
   // il nome della cosa da toccare: la prima parte dell'aria-label (fino alla virgola), oppure il testo del tasto senza le righe piccole
   function nome(el) {
+    var dv = el.getAttribute('data-vignetta');   // il tasto lungo (Il Lupo: «Perfetta: peschi il 9») si indica col solo nome della mossa
+    if (dv) return dv;
     var al = el.getAttribute('aria-label');
     if (al) { var n = al.split(',')[0]; return n; }
     var copia = el.cloneNode(true);

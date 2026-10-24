@@ -34,7 +34,7 @@ h2 { margin: 6px 0; font-size: 1.2rem; }
 .mosse button.suggerita, .azioni .suggerita { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
 .istruzione { display: block; margin-bottom: 6px; color: var(--evid); }
 @keyframes pulsa { 50% { box-shadow: 0 0 0 4px var(--evid); } }
-@media (prefers-reduced-motion: reduce) { .carta.suggerita, .carta.bersaglio { animation: none; box-shadow: 0 0 0 2px var(--evid); } }
+@media (prefers-reduced-motion: reduce) { .carta.suggerita { animation: none; box-shadow: 0 0 0 2px var(--evid); } }
 .carta.no { border-color: var(--no); border-bottom-color: var(--c); box-shadow: 0 0 0 2px var(--no); }
 
 .tavolo { display: flex; gap: 10px; align-items: flex-start; }
@@ -57,11 +57,15 @@ h2 { margin: 6px 0; font-size: 1.2rem; }
 .mosse button { flex: 1 1 0; background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
   min-height: 46px; padding: 2px 0; font-weight: 600; font-size: .82rem; line-height: 1.1; }
 .mosse button.on { border-color: var(--evid); background: #3d4a36; }
-.mosse button.ferma { border-color: var(--no); }
+.mosse button.ferma { border-color: var(--no); flex: 1 1 0; }
+.mosse button.unica { flex: 2.4 1 0; font-size: .98rem; padding: 4px 8px; background: #2f6b46; border-color: var(--ok); }
+.mosse button.unica.spenta { background: transparent; border: 2px dashed #4b5f53; color: var(--tenue); font-weight: 500; opacity: 1; }
+.striscia { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 8px; }
+.regola { border: 2px solid #3a4a41; border-radius: 10px; padding: 5px 8px 6px; color: var(--tenue); font-size: .78rem; line-height: 1.2; }
+.regola b { display: block; color: var(--testo); font-size: .88rem; margin-bottom: 1px; }
+.regola.forma { border-color: var(--evid); background: #3d4a36; color: var(--testo); }
 .mosse .quesito { flex: 1 0 100%; padding: 2px 2px 4px; font-weight: 600; font-size: 1.02rem; }
 .mosse.domanda button { min-height: 52px; font-size: 1.1rem; }
-.carta.bersaglio { border-color: var(--evid); border-bottom-color: var(--c); box-shadow: 0 0 0 2px var(--evid); animation: pulsa 1.2s ease-in-out infinite; }
-.lupo:has(.bersaglio) .carta:not(.bersaglio):not(.scelta) { opacity: .4; }
 .azioni { display: flex; gap: 6px; margin-top: 8px; }
 .azioni button, .grande { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
   min-height: 48px; padding: 2px 4px; font-weight: 600; flex: 1; }
@@ -92,7 +96,7 @@ body.pezzi #app { padding-bottom: 46vh; }
 .pezzo .ok { background: #2f6b46; color: #fff; border: 2px solid var(--ok); border-radius: 10px; min-height: 48px; min-width: 130px; padding: 0 18px; font-weight: 700; font-size: 1.05rem; }
 .acceso { outline: 3px solid var(--evid) !important; outline-offset: 3px; box-shadow: 0 0 0 7px rgba(230, 184, 74, .3) !important;
   position: relative; z-index: 3; opacity: 1 !important; animation: none !important; }
-body.pezzi .carta:not(.acceso), body.pezzi .mosse button:not(.acceso), body.pezzi .mazzo:not(.acceso):not(:has(.acceso)) > div:not(.carta),
+body.pezzi .carta:not(.acceso), body.pezzi .mosse button:not(.acceso), body.pezzi .regola:not(.acceso), body.pezzi .mazzo:not(.acceso):not(:has(.acceso)) > div:not(.carta),
 body.pezzi .etichetta { opacity: .4; }
 .passo.promemoria { position: relative; cursor: pointer; padding-right: 30px; min-height: 0; }
 .passo.promemoria p { margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
