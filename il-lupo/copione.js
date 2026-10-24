@@ -53,7 +53,7 @@
       pezzi: [
         { testo: 'Accanto alle carte del Lupo c\'è il mazzo. **Pescare** vuol dire prendere la sua prima carta, che è sempre scoperta: sai già quale arriva.',
           accendi: ['mazzo'], acceso: 'il mazzo con la carta scoperta (9)' },
-        { testo: 'Per togliere carte al Lupo hai quattro mosse: sono questi tasti. L\'ultimo, Fermati, lo conosci già.',
+        { testo: 'Per togliere carte al Lupo hai quattro mosse: sono questi tasti. L\'ultimo, Fermati, lo conosci già. In partita qui c\'è solo Fermati: tocchi le tue carte, e compaiono solo le mosse che puoi fare con quelle.',
           accendi: ['mosse'], acceso: 'la riga dei quattro tasti delle mosse' },
         { testo: '**Perfetta**: una tua carta uguale a una sua. Il tuo 4 toglie il suo 4. Dopo, peschi tu.',
           accendi: ['carta:R4', 'carta:G4'], acceso: 'il tuo 4 e il 4 del Lupo' },
@@ -74,8 +74,8 @@
           accendi: ['carta:R4', 'carta:G4'], acceso: 'il tuo 4 e il 4 del Lupo' },
         { testo: 'È la mossa migliore: spendi una carta e ne peschi una, così le tue carte restano quattro. E quella che peschi la vedi già: questo 9.',
           accendi: ['carta:G9'], acceso: 'il 9 scoperto del mazzo' },
-        { testo: 'Tocca il tuo 4, poi il 4 del Lupo, poi **Perfetta**, poi **Conferma**.',
-          accendi: ['carta:R4', 'carta:G4', 'tasto:Perfetta'], acceso: 'il tuo 4, il 4 del Lupo, il tasto Perfetta' }
+        { testo: 'Tocca il tuo 4: sotto compaiono **Perfetta** e Sopra. Tocca Perfetta, e il 4 del Lupo lo toglie il gioco.',
+          accendi: ['carta:R4'], acceso: 'il tuo 4 (il tasto Perfetta compare solo dopo averlo toccato)' }
       ],
       mossa: { t: 'gioca', azione: 'perfetta', mie: ['R4'], sue: ['G4'] }, chi: 'tu' },
 
@@ -87,13 +87,13 @@
         { testo: 'Di nuovo: **c\'è una Perfetta?** No, nessuna tua carta è uguale a una sua. E non c\'è nemmeno una Somma o una Divisa: puoi fare solo un Sopra.',
           accendi: ['tue', 'lupo'], acceso: 'le tue carte e quelle del Lupo' },
         { testo: 'Senza Perfetta, la seconda domanda è: **quanto costa ogni mossa?** Col Sopra il prezzo sono le carte che pesca il Lupo: tante quanta è la differenza.',
-          accendi: ['tasto:Sopra'], acceso: 'il tasto Sopra' },
+          accendi: ['tue', 'lupo'], acceso: 'le tue carte e quelle del Lupo (il tasto Sopra compare solo dopo aver toccato una tua carta)' },
         { testo: 'Il tuo 7 sul suo 5 costa due carte. Poco: il Sopra conviene così, con la differenza piccola.',
           accendi: ['carta:V7', 'carta:P5'], acceso: 'il tuo 7 e il 5 del Lupo' },
         { testo: 'Il tuo 9 sul 5 ne costa quattro: è la mossa sbagliata. La facciamo apposta, per vedere che cosa succede al Lupo.',
           accendi: ['carta:G9', 'carta:P5'], acceso: 'il tuo 9 e il 5 del Lupo' },
-        { testo: 'Tocca il tuo 9, poi il 5 del Lupo, poi **Sopra**, poi **Conferma**.',
-          accendi: ['carta:G9', 'carta:P5', 'tasto:Sopra'], acceso: 'il tuo 9, il 5 del Lupo, il tasto Sopra' }
+        { testo: 'Tocca il tuo 9, poi **Sopra**. Stavolta il gioco non sceglie: il 9 è più alto sia dei 3 sia del 5, e quale togliere lo decidi tu. Tocca il 5.',
+          accendi: ['carta:G9', 'carta:P5'], acceso: 'il tuo 9 e il 5 del Lupo (il tasto Sopra compare solo dopo aver toccato il 9)' }
       ],
       mossa: { t: 'gioca', azione: 'sopra', mie: ['G9'], sue: ['P5'] }, chi: 'lupo' },
 
@@ -104,7 +104,7 @@
       pezzi: [
         { testo: 'Ecco il prezzo: il Lupo ha pescato quattro carte, e adesso ne ha sei. Tu ne hai tre.',
           accendi: ['lupo', 'tue'], acceso: 'le sei carte del Lupo e le tue tre' },
-        { testo: '**Riesco a togliere al Lupo tutte le carte prima di finire le mie?** Fattela dopo le due di prima: c\'è una Perfetta, quanto costa ogni mossa. Stavolta la mossa la scegli tu.',
+        { testo: '**Riesco a togliere al Lupo tutte le carte prima di finire le mie?** È la terza domanda, dopo la Perfetta e il prezzo. Stavolta la mossa la scegli tu.',
           accendi: ['lupo', 'tue'], acceso: 'le carte del Lupo e le tue' }
       ],
       mossa: { t: 'fermati' } },
@@ -135,7 +135,7 @@
   var AIUTI = [
     'Non ancora. Prima fai il conto: qui non c\'è una Perfetta, quindi ogni mossa ti lascia una carta in meno. Con tre carte riesci a togliere al Lupo tutte le sue sei?',
     'Ogni mossa che ti resta è un Sopra: a te toglie una carta, al Lupo ne dà almeno quattro. Se vai avanti resti senza carte, e il Lupo segna tutte le sue: più ne ha, più punti fa.',
-    'Conviene fermarti adesso. Tocca Fermati, poi Conferma: il Lupo segna le sue sei carte, prima che diventino di più.'
+    'Conviene fermarti adesso. Tocca Fermati, poi Sì: il Lupo segna le sue sei carte, prima che diventino di più.'
   ];
 
   return { partita: PARTITA, passi: PASSI, aiuti: AIUTI };

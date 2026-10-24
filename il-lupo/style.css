@@ -34,7 +34,7 @@ h2 { margin: 6px 0; font-size: 1.2rem; }
 .mosse button.suggerita, .azioni .suggerita { border-color: var(--evid); box-shadow: 0 0 0 2px var(--evid); }
 .istruzione { display: block; margin-bottom: 6px; color: var(--evid); }
 @keyframes pulsa { 50% { box-shadow: 0 0 0 4px var(--evid); } }
-@media (prefers-reduced-motion: reduce) { .carta.suggerita { animation: none; box-shadow: 0 0 0 2px var(--evid); } }
+@media (prefers-reduced-motion: reduce) { .carta.suggerita, .carta.bersaglio { animation: none; box-shadow: 0 0 0 2px var(--evid); } }
 .carta.no { border-color: var(--no); border-bottom-color: var(--c); box-shadow: 0 0 0 2px var(--no); }
 
 .tavolo { display: flex; gap: 10px; align-items: flex-start; }
@@ -52,10 +52,16 @@ h2 { margin: 6px 0; font-size: 1.2rem; }
 .mano { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; min-height: 80px; }
 .mano .carta { height: 80px; }
 .mano .carta .v { font-size: 1.9rem; }
-.mosse { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 8px; }
-.mosse button { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
+.mosse { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; min-height: 46px; }
+.mosse:empty { display: none; }
+.mosse button { flex: 1 1 0; background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
   min-height: 46px; padding: 2px 0; font-weight: 600; font-size: .82rem; line-height: 1.1; }
 .mosse button.on { border-color: var(--evid); background: #3d4a36; }
+.mosse button.ferma { border-color: var(--no); }
+.mosse .quesito { flex: 1 0 100%; padding: 2px 2px 4px; font-weight: 600; font-size: 1.02rem; }
+.mosse.domanda button { min-height: 52px; font-size: 1.1rem; }
+.carta.bersaglio { border-color: var(--evid); border-bottom-color: var(--c); box-shadow: 0 0 0 2px var(--evid); animation: pulsa 1.2s ease-in-out infinite; }
+.lupo:has(.bersaglio) .carta:not(.bersaglio):not(.scelta) { opacity: .4; }
 .azioni { display: flex; gap: 6px; margin-top: 8px; }
 .azioni button, .grande { background: var(--pannello); border: 2px solid #4b5f53; border-radius: 10px;
   min-height: 48px; padding: 2px 4px; font-weight: 600; flex: 1; }
