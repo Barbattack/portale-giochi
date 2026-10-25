@@ -6,14 +6,15 @@
  * Il numero va anche nella variabile CSS --vel (solatro.css: le carte che entrano, la barra, il colpo del numero).
  * Primo giro (26/10 notte): tutto in ~1 s, Damiano: «troooooppa veloci, nemmeno si vedono quasi». Rallentato in modo deciso (×2,2).
  *
- * LA GIOCATA, dal tocco alla mano di nuovo pronta (a VELOCITA = 1: la mano è pronta a 1,9 s con 5 carte nuove; la cassa si aggiorna a
- * 1,7 s e la barra finisce di salire a 2,3 s; tutto sparisce a 2,4 s):
- *   0–900 ms      le carte giocate salgono e svaniscono (translateY −46 px, scala 1,06 a metà; curva --curva, cubic-bezier(.2,.8,.2,1))
- *   250–1750 ms   il lampo della combinazione («FULL · +60») compare al centro della mano (scala .6→1 nei primi 300 ms, poi fermo oltre un secondo, poi via)
- *   1100–1700 ms  il «+60» vola dal lampo alla cassa (cubic-bezier(.4,0,1,1): accelera verso la cassa)
- *   1700 ms       la cassa si aggiorna: il numero batte (scala 1,12, 600 ms) e la barra sale (transizione di 600 ms in solatro.css)
- *   900 ms +      le carte nuove entrano in mano una alla volta (420 ms l'una, 180 ms di scarto: con 5 carte l'ultima finisce a 2040 ms)
- * LO SCARTO: le carte scartate scendono e svaniscono (450 ms), le nuove entrano da 250 ms, una alla volta (con 2 carte l'ultima finisce a 850 ms, con 5 a 1390).
+ * LA GIOCATA, le fasi IN FILA (26/10, terzo passaggio; a VELOCITA = 1 la mano è pronta a 3,7 s con 5 carte nuove, 3,1 s con una;
+ * la cassa si aggiorna a 1,8 s e la barra finisce di salire a 2,4 s; tutto sparisce a 3,8 s):
+ *   0–500 ms      le carte giocate escono dalla mano e si mettono in posa in una fila sotto il banco (scala .8); la mano si smorza (.mano.in-posa)
+ *   500–800 ms    il lampo «FULL · +60» compare sopra la fila (scala .6→1), poi resta FERMO fino a 2400 ms (1,6 s per leggerlo), poi va via entro 2800
+ *   1300–1800 ms  il «+60» vola dal lampo alla cassa, volo corto (cubic-bezier(.4,0,1,1))
+ *   1800 ms       la cassa si aggiorna: il numero batte (600 ms) e la barra sale (transizione di 600 ms, fino a 2400)
+ *   2400–2800 ms  le carte in posa salgono e svaniscono; la mano si riaccende
+ *   2700 ms +     le carte nuove entrano una alla volta (380 ms l'una, 160 ms di scarto: con 5 carte l'ultima finisce a 3720 ms)
+ * LO SCARTO: le carte scartate scendono e svaniscono (450 ms), le nuove entrano da 250 ms, una alla volta (con 2 carte l'ultima finisce a 790 ms, con 5 a 1270).
  * UN TOCCO salta tutto: le animazioni finiscono subito, la cassa si aggiorna, il tocco non passa al tavolo.
  * Con prefers-reduced-motion: reduce non si anima niente: lo stato nuovo appare subito.
  */
@@ -62,7 +63,13 @@
     return { x: cx, y: cy };
   }
 
-  // DOPO la giocata (il tavolo è già ridisegnato con la cassa VECCHIA e le carte nuove in .entra): info = { nome, punti, aggiornaCassa }
+  // DOPO la giocata (il tavolo è già ridisegnato con la cassa VECCHIA e le carte nuove in .entra, invisibili fino al loro turno): info = { nome, punti, aggiornaCassa }
+  // Le fasi in fila, una cosa sola che si muove per volta (26/10, dopo la prova di Damiano: «si vede bene solo la pesca»):
+  //   1. le carte giocate escono dalla mano e si mettono in posa in una fila sotto il banco (in alto, lontano dal pollice); la mano si smorza
+  //   2. sopra la fila, grande, «COLORE · +50»: resta fermo 1,6 s
+  //   3. il «+50» vola nella cassa (volo corto: la fila sta subito sotto il banco), il numero batte, la barra sale
+  //   4. le carte in posa e il lampo se ne vanno, la mano si riaccende
+  //   5. le carte nuove entrano una alla volta (CSS, .mano.dopo-giocata)
   function giocata(app, t, info) {
     prenotata = false;
     if (ridotto || !t || !t.carte.length) { info.aggiornaCassa(); annulla(); return; }
@@ -70,32 +77,49 @@
     var s = layer(), anims = [], timer = [];
     document.body.classList.add('anima');
     cloni(t, s);
-    t.carte.forEach(function (c) {
-      anims.push(c.clone.animate([
-        { transform: 'translateY(0) scale(1)', opacity: 1 }, { transform: 'translateY(-18px) scale(1.06)', opacity: 1, offset: .45 }, { transform: 'translateY(-46px) scale(1.02)', opacity: 0 }
-      ], { duration: T(900), easing: CURVA, fill: 'forwards' }));
+    var mano = app.querySelector('.mano'); if (mano) mano.classList.add('in-posa');
+    // la fila in posa: sotto il banco, centrata; carte all'80 %
+    var banco = app.querySelector('.banco'), bb = banco ? banco.getBoundingClientRect().bottom : 200;
+    if (bb < 60) bb = 60;   // banco fuori dallo schermo (pagina scorsa): la fila sta comunque in alto, in vista
+    var SCALA = .8, n = t.carte.length, w0 = t.carte[0].r.width, h0 = t.carte[0].r.height, w = w0 * SCALA, gap = 6;
+    var larg = n * w + (n - 1) * gap, x0 = (window.innerWidth - larg) / 2, yFila = bb + 108;
+    t.carte.forEach(function (c, i) {
+      var tx = x0 + i * (w + gap) - c.r.left, ty = yFila - c.r.top;
+      c.posa = 'translate(' + tx + 'px,' + ty + 'px) scale(' + SCALA + ')'; c.via = 'translate(' + tx + 'px,' + (ty - 40) + 'px) scale(' + SCALA + ')';
+      c.clone.style.transformOrigin = '0 0';
+      anims.push(c.clone.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: c.posa }], { duration: T(500), easing: CURVA, fill: 'forwards' }));
     });
-    var c = centro(t);
+    // 2. il lampo, sopra la fila
+    var cx = window.innerWidth / 2, cy = bb + 52;
     var lampo = document.createElement('div'); lampo.className = 'lampo';
     var b = document.createElement('b'); b.textContent = info.nome; var sp = document.createElement('span'); sp.textContent = '+' + info.punti;
-    lampo.appendChild(b); lampo.appendChild(sp); lampo.style.left = c.x + 'px'; lampo.style.top = c.y + 'px'; s.appendChild(lampo);
+    lampo.appendChild(b); lampo.appendChild(sp); lampo.style.left = cx + 'px'; lampo.style.top = cy + 'px'; s.appendChild(lampo);
     anims.push(lampo.animate([
-      { transform: 'translate(-50%,-50%) scale(.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.04)', opacity: 1, offset: .2 },
-      { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .88 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }
-    ], { duration: T(1500), delay: T(250), easing: CURVA, fill: 'forwards' }));
+      { transform: 'translate(-50%,-50%) scale(.6)', opacity: 0, easing: CURVA }, { transform: 'translate(-50%,-50%) scale(1.04)', opacity: 1, offset: .13, easing: 'linear' },
+      { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .83, easing: CURVA }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }
+    ], { duration: T(2300), delay: T(500), easing: 'linear', fill: 'forwards' }));   // la curva sta su ogni intervallo: fermo davvero fino all'83 %
+    // 3. il volo dei punti e la cassa
     var cassa = app.querySelector('.cassa .totale'), cr = cassa ? cassa.getBoundingClientRect() : { left: 80, top: 80, width: 0, height: 0 };
     var volo = document.createElement('div'); volo.className = 'punti-volo'; volo.textContent = '+' + info.punti;
-    volo.style.left = c.x + 'px'; volo.style.top = c.y + 'px'; s.appendChild(volo);
-    var dx = cr.left + cr.width / 2 - c.x, dy = cr.top + cr.height / 2 - c.y;
+    volo.style.left = cx + 'px'; volo.style.top = cy + 'px'; s.appendChild(volo);
+    var dx = cr.left + cr.width / 2 - cx, dy = cr.top + cr.height / 2 - cy;
     anims.push(volo.animate([
-      { transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .15 },
+      { transform: 'translate(-50%,-50%) scale(1)', opacity: 0, easing: 'linear' }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .15, easing: USCITA },
       { transform: 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) scale(.55)', opacity: 1 }
-    ], { duration: T(600), delay: T(1100), easing: USCITA, fill: 'forwards' }));
+    ], { duration: T(500), delay: T(1300), easing: 'linear', fill: 'forwards' }));
     var aggiornata = false;
     function aggiorna() { if (aggiornata) return; aggiornata = true; info.aggiornaCassa(); var ca = app.querySelector('.cassa'); if (ca) { ca.classList.add('colpo'); setTimeout(function () { ca.classList.remove('colpo'); }, T(600)); } }
-    timer.push(setTimeout(aggiorna, T(1700)));
-    timer.push(setTimeout(finisci, T(2400)));
-    inCorso = { animazioni: anims, timer: timer, fine: aggiorna };
+    timer.push(setTimeout(aggiorna, T(1800)));
+    // 4. le carte in posa se ne vanno, la mano si riaccende
+    timer.push(setTimeout(function () {
+      t.carte.forEach(function (c) {
+        // trasformazioni assolute: una seconda animazione «in aggiunta» sostituiva la prima e le carte saltavano indietro nella mano (foto del 26/10)
+        anims.push(c.clone.animate([{ transform: c.posa, opacity: 1 }, { transform: c.via, opacity: 0 }], { duration: T(400), easing: USCITA, fill: 'forwards' }));
+      });
+      if (mano) mano.classList.remove('in-posa');
+    }, T(2400)));
+    timer.push(setTimeout(finisci, T(3800)));
+    inCorso = { animazioni: anims, timer: timer, fine: function () { aggiorna(); if (mano) mano.classList.remove('in-posa'); } };
   }
 
   // DOPO lo scarto: le carte scartate scendono e svaniscono

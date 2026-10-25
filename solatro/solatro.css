@@ -201,15 +201,18 @@ body.copertina .pannello p { color: var(--tenue); }
 .strato-anima .carta .s { align-self: center; justify-self: center; font-size: 2.1rem; margin-top: -8px; }
 .lampo { position: fixed; transform: translate(-50%, -50%); background: var(--carta); color: #111; border: 3px solid var(--tema); box-shadow: 6px 6px 0 #000; padding: 10px 20px 11px; text-align: center; white-space: nowrap;
   clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); opacity: 0; }
-.lampo b { display: block; font: 700 1.7rem/1 var(--titolo); text-transform: uppercase; letter-spacing: .03em; }
-.lampo span { display: block; font: 700 1.1rem/1.2 var(--testo); color: #8A5A05; margin-top: 2px; }
-.punti-volo { position: fixed; font: 700 1.7rem/1 var(--testo); color: var(--tema); text-shadow: 0 2px 0 #000, 0 0 0 #000; opacity: 0; }
+.lampo b { display: block; font: 700 2rem/1 var(--titolo); text-transform: uppercase; letter-spacing: .03em; }
+.lampo span { display: block; font: 700 1.35rem/1.2 var(--testo); color: #8A5A05; margin-top: 3px; }
+.punti-volo { position: fixed; font: 700 1.9rem/1 var(--testo); color: var(--tema); text-shadow: 0 2px 0 #000, 0 0 0 #000; opacity: 0; }
 .cassa.colpo .totale { animation: colpo calc(600ms * var(--vel, 1)) var(--curva); }
 @keyframes colpo { 40% { transform: scale(1.12); color: var(--tema); } }
 /* la pescata: le carte nuove entrano una alla volta (420 ms l'una, 180 ms di scarto); dopo una giocata partono a 900 ms, dopo uno scarto a 250 ms.
    Tutti i tempi sono moltiplicati per --vel, il moltiplicatore di anima.js (secondo giro, 26/10: Damiano le voleva più lente). */
-.carta.entra { animation: entra-carta calc(420ms * var(--vel, 1)) var(--curva) both; animation-delay: calc((var(--base, 250ms) + var(--i, 0) * 180ms) * var(--vel, 1)); }
-.mano.dopo-giocata { --base: 900ms; }
+.carta.entra { animation: entra-carta calc(380ms * var(--vel, 1)) var(--curva) both; animation-delay: calc((var(--base, 250ms) + var(--i, 0) * 160ms) * var(--vel, 1)); }
+.mano.dopo-giocata { --base: 2700ms; }   /* dopo la posa, il lampo, il volo e l'uscita delle carte giocate */
+/* la mano si smorza mentre le carte giocate sono in posa (anima.js) */
+.mano .carta { transition: transform 120ms var(--curva), outline-color 120ms linear, opacity calc(400ms * var(--vel, 1)) linear; }
+.mano.in-posa .carta { opacity: .3; }
 .mano.dopo-scarto { --base: 250ms; }
 @keyframes entra-carta { from { transform: translateY(26px) scale(.94); opacity: 0; } }
 .mano.subito .carta.entra { animation: none; }
