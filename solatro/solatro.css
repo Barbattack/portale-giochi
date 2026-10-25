@@ -1,0 +1,182 @@
+/*
+ * SOLATRO — il tema (Chiara, 25/10/2026). Si carica DOPO comune.css (giochi/design/comune.css).
+ * La forma madre sono LE MONETE: l'autore segna i round con le monetine da un quarto (25 centesimi: il primo traguardo è 25) e copre
+ * i bonus comprati con le monetine da dieci. Qui una fascia a tutta larghezza, «il banco», attraversa lo schermo sotto il titolo:
+ * la moneta del round, la cassa (punti su traguardo, col suo riempimento), e giocate e scarti come gettoni che si spengono quando li spendi.
+ * I bonus del negozio sono gettoni rotondi. Il panno è verde (lo zio è un uomo da poker), le monete sono d'oro, il rosa è della sala giochi:
+ * il rifiuto, l'anello della vignetta, il jolly.
+ * Titolo in Pixelify Sans (Stefie Justprince, SIL OFL 1.1, giochi/design/fonts/OFL-PixelifySans.txt): un carattere a pixel, il videogioco
+ * che non c'è. Il resto dell'interfaccia in Barlow, come in tutti i giochi.
+ */
+@font-face { font-family: "Pixelify Sans"; src: url("../comune/fonts/PixelifySans%5Bwght%5D.ttf") format("truetype"); font-weight: 400 700; font-display: block; }
+
+:root {
+  --fondo: #0C2B22;        /* il panno verde, scuro: tutta la pagina */
+  --fondo-2: #154238;      /* il panno sotto la luce: il banco, i pannelli, le tessere */
+  --tema: #F2B233;         /* oro moneta: il banco, Gioca, ciò che è scelto */
+  --oro-scuro: #B57A10;    /* il bordo delle monete */
+  --su-tema: #1A1206;
+  --accento: #FF3D8A;      /* rosa sala giochi: il rifiuto, l'anello della vignetta, il jolly */
+  --inchiostro: #F6F1E3;
+  --tenue: #9EC2B1;
+  --titolo: "Pixelify Sans", "Courier New", monospace;
+  --alone: rgba(242, 178, 51, .45);
+  /* IL DORSO: la cornice comune (doppio bordino nei colori del gioco: oro fuori, rosa dentro) e, dentro, tre monete d'oro impilate
+     di sbieco con una picca sulla moneta in cima, e la stella del jolly. Niente esce dalla cornice. */
+  --dorso: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 63 88'><rect width='63' height='88' rx='4' fill='%230C2B22'/><rect x='3' y='3' width='57' height='82' rx='2' fill='none' stroke='%23F2B233' stroke-width='1.6'/><rect x='6.5' y='6.5' width='50' height='75' fill='none' stroke='%23FF3D8A' stroke-width='1'/><g><circle cx='24' cy='58' r='13' fill='%23B57A10'/><circle cx='24' cy='56' r='13' fill='%23F2B233' stroke='%23B57A10' stroke-width='1.2' stroke-dasharray='1.5 1.5'/><circle cx='31' cy='50' r='13' fill='%23B57A10'/><circle cx='31' cy='48' r='13' fill='%23F2B233' stroke='%23B57A10' stroke-width='1.2' stroke-dasharray='1.5 1.5'/><circle cx='38' cy='42' r='13' fill='%23B57A10'/><circle cx='38' cy='40' r='13' fill='%23F2B233' stroke='%23B57A10' stroke-width='1.2' stroke-dasharray='1.5 1.5'/><circle cx='38' cy='40' r='9.5' fill='none' stroke='%23B57A10' stroke-width='.9'/><path d='M38 33.5c-3.2 3.8-5.6 5.6-5.6 8.2a3 3 0 0 0 4.8 2.4c-.3 1.6-1 2.6-2 3.4h5.6c-1-.8-1.7-1.8-2-3.4a3 3 0 0 0 4.8-2.4c0-2.6-2.4-4.4-5.6-8.2z' fill='%230C2B22'/></g><path d='M17 17l1.9 4.2 4.6.5-3.4 3.1 1 4.5-4.1-2.3-4.1 2.3 1-4.5-3.4-3.1 4.6-.5z' fill='%23FF3D8A'/></svg>");
+}
+
+/* la testa: il titolo a pixel, d'oro, con la A fatta a carta come nel libretto dell'autore */
+h1 { color: var(--tema); letter-spacing: .02em; font-size: 1.9rem; display: inline-flex; align-items: center; gap: 1px; }
+h1 .a-carta { display: inline-flex; align-items: center; justify-content: center; width: .72em; height: 1em; margin: 0 .04em; background: var(--carta); color: var(--carta-nero); border-radius: 2px;
+  font: 700 .62em/1 var(--testo); transform: rotate(-8deg); box-shadow: 1px 1px 0 #000; }
+body.copertina h1 { font-size: 3rem; }
+/* la testa su due righe: marchio e titolo, poi i due tasti piccoli a destra (a 375 non ci stanno in una riga sola) */
+.top { padding: 10px 0 6px; gap: 4px 10px; justify-content: flex-start; }
+/* i titoli nel carattere a pixel stanno in maiuscolo: in minuscolo «finita» si legge «Anita» (foto del 25/10) */
+h2 { text-transform: uppercase; letter-spacing: .03em; }
+.top .dx { flex-basis: 100%; justify-content: flex-end; }
+.mini { border-color: var(--tenue); color: var(--inchiostro); min-height: 36px; }
+.msg:empty { min-height: .5em; margin: 6px 0 0; }
+.mini.attesa { border-color: var(--accento); color: var(--accento); }
+
+/* IL BANCO: la forma madre, a tutta larghezza. Moneta del round · cassa · gettoni di giocate e scarti. */
+.banco { display: grid; grid-template-columns: 62px 1fr auto; gap: 4px 12px; align-items: center; margin: 4px -10px 0; padding: 10px 12px 12px;
+  background: var(--fondo-2); border-top: 4px solid var(--tema); border-bottom: 4px solid var(--tema); box-shadow: 0 4px 0 #000; }
+.monete { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.monete .lab, .conteggi .lab, .cassa .lab { font: 700 .62rem/1 var(--testo); text-transform: uppercase; letter-spacing: .14em; color: var(--tenue); }
+.moneta { position: relative; width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #FFE08A, var(--tema) 55%, #D9961C); color: var(--su-tema); font: 700 1.5rem/1 var(--testo);
+  box-shadow: inset 0 0 0 3px var(--oro-scuro), inset 0 0 0 5px #FFD36B, 0 3px 0 #000; }
+.monete .fila { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; max-width: 62px; min-height: 8px; }
+.monete .fila i { width: 8px; height: 8px; border-radius: 50%; background: var(--tema); box-shadow: inset 0 0 0 1.5px var(--oro-scuro); }
+.cassa { min-width: 0; }
+.cassa .totale { font: 700 2.5rem/1 var(--testo); color: var(--inchiostro); white-space: nowrap; }
+.cassa .totale small { font-size: 1.05rem; color: var(--tenue); font-weight: 600; margin-left: 2px; }
+.cassa.fatto .num { color: var(--tema); }
+.cassa .metro { height: 10px; margin: 6px 0 5px; background: #071B15; border-radius: 5px; overflow: hidden; box-shadow: inset 0 0 0 1px #000; }
+.cassa .metro i { display: block; height: 100%; width: 0; background: var(--tema); transition: width 300ms var(--curva); }
+.cassa.fatto .metro i { background: linear-gradient(90deg, var(--tema), #FFE08A); }
+.cassa .sotto { font: 600 .74rem/1.1 var(--testo); color: var(--tenue); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
+.cassa.fatto .sotto { color: var(--tema); }
+.conteggi { display: flex; flex-direction: column; gap: 7px; align-items: flex-end; }
+.conteggi > div { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.gettoni-c { display: flex; gap: 3px; }
+.gettoni-c i { width: 15px; height: 15px; border-radius: 50%; background: var(--tema); box-shadow: inset 0 0 0 2px var(--oro-scuro); transition: opacity 200ms; }
+.gettoni-c i.spento { background: transparent; box-shadow: inset 0 0 0 2px var(--tenue); opacity: .45; }
+.gettoni-c i.extra { background: var(--accento); box-shadow: inset 0 0 0 2px #B0205A; }
+
+/* LA RISERVA: il jolly da parte e i gettoni comprati, sempre in vista sotto il banco */
+.riserva { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; min-height: 44px; }
+.chip { border-radius: 22px; min-height: 40px; padding: 0 12px; background: var(--fondo-2); border: 2px solid var(--tenue); color: var(--inchiostro);
+  font: 600 .82rem/1 var(--testo); text-transform: uppercase; letter-spacing: .06em; display: inline-flex; align-items: center; gap: 6px; }
+.chip.nessuno { background: transparent; border-style: dashed; color: var(--tenue); font-weight: 400; cursor: default; text-transform: none; letter-spacing: 0; }
+.chip.jolly { border-color: var(--accento); background: var(--carta); color: #111; border-radius: 5px; padding: 0 10px 0 8px; }
+.chip.jolly .stella { color: var(--accento); font-size: 1.3rem; line-height: 1; }
+.chip.jolly.scelto { outline: 3px solid var(--tema); outline-offset: 1px; transform: translateY(-3px); box-shadow: 0 5px 0 rgba(0, 0, 0, .55); }
+.gettone { border-color: var(--tema); background: radial-gradient(circle at 35% 30%, #1E5A4C, var(--fondo-2) 60%); }
+.gettone::before { content: ''; width: 14px; height: 14px; border-radius: 50%; background: var(--tema); box-shadow: inset 0 0 0 2px var(--oro-scuro); flex: none; }
+.gettone.aperto { background: var(--tema); color: var(--su-tema); }
+.gettone.aperto::before { background: var(--su-tema); box-shadow: none; }
+.chip.doppio { border-color: var(--accento); color: var(--accento); cursor: default; }
+.info { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 10px 12px; background: var(--carta); color: #111; border-left: 6px solid var(--tema); box-shadow: 0 4px 0 #000; }
+.info p { margin: 0; flex: 1; font-size: .95rem; line-height: 1.3; font-weight: 500; }
+.info .usa { flex: none; min-height: 44px; min-width: 88px; background: var(--tema); border: 0; color: var(--su-tema); font: 700 1rem/1 var(--testo); text-transform: uppercase; letter-spacing: .06em;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+.info .usa.spenta { background: transparent; border: 2px dashed var(--tenue); color: #555; clip-path: none; }
+
+/* LA MANO: 8 carte in 4 colonne (82 px di larghezza a 375); con Carta extra, 9 in 5 colonne (64 px): si leggono e si toccano ancora */
+.etichetta.mano-nota { margin-top: 12px; display: flex; justify-content: space-between; }
+.mano { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+.mano.nove { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.mano .carta { height: 88px; display: grid; grid-template-rows: auto 1fr; }
+.mano.nove .carta { height: 80px; }
+.mano .carta .v { justify-self: start; padding: 5px 0 0 7px; font: 700 1.2rem/1 var(--testo); }
+.mano .carta .s { align-self: center; justify-self: center; font-size: 2.1rem; margin-top: -8px; }
+.mano.nove .carta .s { font-size: 1.8rem; }
+/* scelta ma non conta (non fa parte della combinazione): si alza lo stesso, ma col bordo tratteggiato, smorzata */
+.mano .carta.scelta.senza { outline: 3px dashed var(--tenue); opacity: .62; box-shadow: 0 6px 0 rgba(0, 0, 0, .35); }
+.mano .vuota { grid-column: 1 / -1; color: var(--tenue); text-align: center; padding: 18px 0; border: 2px dashed var(--tenue); }
+
+/* I numeri (cassa, monete, prezzi, round) stanno in Barlow, non nel carattere a pixel: a pixel il 5 si legge come una S (foto del 25/10). */
+/* I TASTI: Gioca dice la combinazione e i punti (il tasto unico di Il Lupo); Scarta accanto, più stretto */
+.azioni .gioca { flex: 2.3; }
+.azioni .gioca.spenta { background: transparent; border: 2px dashed var(--tenue); color: var(--tenue); clip-path: none; font-weight: 600; letter-spacing: .03em; }
+.azioni .scarta { flex: 1; }
+.azioni .scarta.spenta { border-style: dashed; border-color: var(--tenue); color: var(--tenue); }
+.azioni .chiudi { flex: 1; }
+
+/* IL NEGOZIO: il banco col round superato, la cassa dei punti da spendere, sei gettoni in due colonne */
+.banco.esito { grid-template-columns: 62px 1fr; }
+.banco.esito .cassa .totale { font-size: 1.9rem; }
+.banco.esito .titolo { font: 700 1.05rem/1.1 var(--titolo); color: var(--tema); text-transform: uppercase; letter-spacing: .03em; }
+.spesa { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin: 14px 0 8px; }
+.spesa .totale { font: 700 3rem/1 var(--testo); color: var(--tema); }
+.spesa .lab { font: 700 .74rem/1 var(--testo); text-transform: uppercase; letter-spacing: .14em; color: var(--tenue); }
+.articoli { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.articolo { background: var(--fondo-2); padding: 10px 10px 10px; display: flex; flex-direction: column; gap: 5px; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); min-width: 0; }
+.articolo .testa { display: flex; align-items: center; gap: 8px; }
+.articolo .prezzo { flex: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #FFE08A, var(--tema) 55%, #D9961C); color: var(--su-tema); font: 700 .95rem/1 var(--testo); box-shadow: inset 0 0 0 2px var(--oro-scuro), 0 2px 0 #000; }
+.articolo b { font: 700 .92rem/1.1 var(--testo); text-transform: uppercase; letter-spacing: .03em; }
+.articolo span.eff { font-size: .8rem; line-height: 1.25; color: var(--tenue); flex: 1; }
+.articolo button { min-height: 44px; margin-top: 2px; border: 2px solid var(--tema); background: var(--tema); color: var(--su-tema); font: 700 .95rem/1 var(--testo); text-transform: uppercase; letter-spacing: .06em;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+.articolo button.no { background: transparent; border: 2px dashed var(--tenue); color: var(--tenue); clip-path: none; font-weight: 600; text-transform: none; letter-spacing: 0; cursor: default; }
+.articolo.tuo { outline: 2px solid var(--tema); outline-offset: -2px; }
+.articolo.tuo .prezzo { background: var(--accento); color: #fff; box-shadow: inset 0 0 0 2px #B0205A, 0 2px 0 #000; }   /* la monetina da dieci sul bonus comprato */
+.articolo button.tuo { background: transparent; border-color: var(--tema); color: var(--tema); clip-path: none; cursor: default; }
+.negozio .azioni { margin-top: 12px; }
+.negozio .azioni .prossimo { flex: 1; }
+
+/* LA FINE: le monete vinte, il round, il grado del regolamento su una scala di quattro gradini */
+.fine .monete-fine { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin: 6px 0 10px; }
+.fine .monete-fine i { width: 18px; height: 18px; border-radius: 50%; background: var(--tema); box-shadow: inset 0 0 0 2px var(--oro-scuro), 0 2px 0 #000; }
+.fine .monete-fine i.persa { background: transparent; box-shadow: inset 0 0 0 2px var(--accento); }
+.fine .round { font: 700 4rem/1 var(--testo); color: var(--inchiostro); margin: 0; }
+.fine .grado { font: 700 1.5rem/1.1 var(--titolo); color: var(--tema); margin: 8px 0 2px; text-transform: uppercase; letter-spacing: .03em; }
+.fine .grado.nessuno { color: var(--tenue); font-size: 1.1rem; }
+.scala { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; text-align: left; }
+.scala li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 12px; background: var(--fondo); color: var(--tenue); font: 600 .9rem/1.1 var(--testo); }
+.scala li .da { font: 700 1rem/1 var(--testo); color: var(--tenue); white-space: nowrap; }
+.scala li.raggiunto { background: var(--tema); color: var(--su-tema); }
+.scala li.raggiunto .da { color: var(--su-tema); }
+.scala li.prossimo { outline: 2px dashed var(--tema); outline-offset: -2px; color: var(--inchiostro); }
+.fine .record { margin: 12px 0 0; color: var(--tenue); font-size: .9rem; }
+.fine .record.nuovo { color: var(--tema); font-weight: 700; font-size: 1.05rem; }
+.pannello h2 { color: var(--tema); }
+
+/* IL TUTORIAL: il promemoria del passo sta in alto, avorio, due righe; la vignetta scorre fino alla cosa da toccare */
+.passo { position: sticky; top: 0; z-index: 6; margin-top: 8px; padding: 10px 30px 11px 12px; background: var(--carta); color: #111; border-left: 6px solid var(--tema);
+  box-shadow: 0 4px 0 #000; font-weight: 500; font-size: .98rem; line-height: 1.4; }
+.passo p b { color: #8A5A05; }
+/* durante i pezzetti il tasto si può accendere: la riga dei tasti torna nel flusso, visibile, e si spegne quando non è lei a parlare */
+body.pezzi .azioni { visibility: visible; position: static; pointer-events: none; }
+body.pezzi .carta:not(.acceso), body.pezzi .banco > *:not(.acceso):not(:has(.acceso)), body.pezzi .riserva > *:not(.acceso), body.pezzi .azioni button:not(.acceso),
+body.pezzi .articolo:not(.acceso), body.pezzi .spesa:not(.acceso), body.pezzi .mini:not(.acceso), body.pezzi .conteggi > div:not(.acceso), body.pezzi .msg { opacity: .35; }
+body.pezzi .banco { box-shadow: none; }
+.acceso.carta { transform: translateY(-4px); }
+/* l'aiuto del turno «trova»: lo stesso cartello del rifiuto (avorio, banda rosa), perché è il gioco che parla */
+
+/* LE REGOLETTE: «Come si gioca», una schermata sola, sei regole disegnate (overlay del prototipo) */
+.regole { position: fixed; inset: 0; z-index: 40; background: var(--fondo); color: var(--inchiostro); overflow-y: auto; padding: 14px 12px 20px; }
+.regole .dentro { max-width: 560px; margin: 0 auto; }
+.regole h2 { color: var(--tema); font-size: 1.6rem; margin: 6px 0 12px; }
+.regole ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.regole li { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; background: var(--fondo-2); padding: 10px 12px 10px 8px; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+.regole li svg { width: 64px; height: 56px; display: block; }
+.regole li b { display: block; font: 700 .95rem/1.15 var(--testo); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+.regole li span { font-size: .9rem; line-height: 1.35; color: #DCE9E2; }
+.regole li span i { font-style: normal; color: var(--tema); font-weight: 700; }
+.regole .azioni { position: sticky; bottom: 0; background: var(--fondo); margin-top: 12px; }
+.regole .azioni button.chiudi { border-color: var(--tenue); color: var(--inchiostro); }
+
+/* la copertina: la riga di spiegazione e i tasti come in tutti i giochi; il dorso grande fluttua (comune.css) */
+body.copertina .pannello p { color: var(--tenue); }
+
+@media (min-width: 700px) {
+  .mano .carta { height: 100px; }
+  .mano.nove .carta { height: 92px; }
+  h1 { font-size: 2.3rem; }
+  .cassa .totale { font-size: 3rem; }
+}
