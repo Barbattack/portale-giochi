@@ -157,7 +157,13 @@
   function aggiornaCassa() {
     cassaMostra = null;
     var c = app.querySelector('.banco .cassa'); if (!c || g.fase !== 'round') return;
-    var nuovo = cassa(g.punti, g.traguardo); c.parentNode.replaceChild(nuovo, c);
+    var nuovo = cassa(g.punti, g.traguardo);
+    // la barra si vede salire: il nodo nuovo parte dalla larghezza di prima e poi va a quella vera (transizione in solatro.css, 600 ms × --vel)
+    var vecchia = c.querySelector('.metro i'), riempi = nuovo.querySelector('.metro i'), larghezza = riempi.style.width;
+    riempi.style.width = vecchia ? vecchia.style.width : '0%';
+    c.parentNode.replaceChild(nuovo, c);
+    void nuovo.offsetWidth;
+    riempi.style.width = larghezza;
   }
   function giocaScelta() {
     var ok = permesso({ tipo: 'gioca' });
@@ -276,6 +282,12 @@
     e.appendChild(el('span', 's', S.SIMBOLO_SEME[c.seme] + '︎'));
     return e;
   }
+  // il messaggio: uno spazio fisso, il testo ci sta sopra (.dentro) e non sposta niente (solatro.css)
+  function messaggio() {
+    var m = el('div', 'msg' + (msgOk ? ' ok' : '') + (msg ? '' : ' vuoto'));
+    m.appendChild(el('span', 'dentro', msg || ''));
+    return m;
+  }
   function testoChiusura() {
     var t = g.punti >= g.traguardo ? 'passi' : g.bonus.scudo ? 'lo Scudo ti fa passare' : 'la partita finisce';
     return g.punti + ' su ' + g.traguardo + ': ' + t;
@@ -284,7 +296,7 @@
     app.appendChild(intestazione(tastiTesta()));
     app.appendChild(banco());
     riserva();
-    app.appendChild(el('div', 'msg' + (msgOk ? ' ok' : ''), msg));
+    app.appendChild(messaggio());
     var mano = el('div', 'mano' + (g.mano.length > 8 ? ' nove' : '') + (pesca ? ' ' + pesca : ''));
     var l = lettura(), k = 0;
     g.mano.forEach(function (c) {
@@ -354,7 +366,7 @@
     var r = restano();
     var spesa = el('div', 'spesa'); spesa.appendChild(el('span', 'totale', String(r))); spesa.appendChild(el('span', 'lab', 'da spendere'));
     box.appendChild(spesa);
-    box.appendChild(el('div', 'msg' + (msgOk ? ' ok' : ''), msg));
+    box.appendChild(messaggio());
     var art = el('div', 'articoli');
     S.BONUS.forEach(function (bo) {
       var tuo = !!g.bonus[bo.id], segnato = sel.bonus.indexOf(bo.id) >= 0, manca = bo.costo - r;

@@ -39,7 +39,14 @@ body.copertina h1 { font-size: 3rem; }
 h2 { text-transform: uppercase; letter-spacing: .03em; }
 .top .dx { flex-basis: 100%; justify-content: flex-end; }
 .mini { border-color: var(--tenue); color: var(--inchiostro); min-height: 36px; }
-.msg:empty { min-height: .5em; margin: 6px 0 0; }
+/* IL MESSAGGIO NON SPINGE NIENTE (Damiano, 26/10: «tutto si sposta un po' più in alto e si rischia di premere il pulsante»): lo spazio sopra la
+   mano è fisso (50 px) in tutti gli stati; il testo, ok o rifiuto, sta in .dentro, appoggiato sopra, e se è più lungo sporge sulle carte
+   senza muoverle (e non prende i tocchi). */
+.msg, .msg:empty, .msg.ok, .msg:not(.ok):not(:empty) { position: relative; height: 50px; min-height: 50px; margin: 8px 0 0; padding: 0; border: 0; background: none; box-shadow: none; font-weight: 400; }
+.msg .dentro { position: absolute; left: 0; right: 0; top: 0; z-index: 4; pointer-events: none; padding: 2px 0 2px 10px; border-left: 3px solid var(--tema); font-size: .98rem; line-height: 1.3; }
+.msg.ok .dentro { color: var(--inchiostro); }
+.msg:not(.ok) .dentro { background: var(--carta); color: #111; border-left: 6px solid var(--accento); padding: 10px 12px 11px; font-weight: 600; box-shadow: 0 4px 0 #000; }
+.msg.vuoto .dentro { display: none; }
 .mini.attesa { border-color: var(--accento); color: var(--accento); }
 
 /* IL BANCO: la forma madre, a tutta larghezza. Moneta del round · cassa · gettoni di giocate e scarti. */
@@ -57,7 +64,7 @@ h2 { text-transform: uppercase; letter-spacing: .03em; }
 .cassa .totale small { font-size: 1.05rem; color: var(--tenue); font-weight: 600; margin-left: 2px; }
 .cassa.fatto .num { color: var(--tema); }
 .cassa .metro { height: 10px; margin: 6px 0 5px; background: #071B15; border-radius: 5px; overflow: hidden; box-shadow: inset 0 0 0 1px #000; }
-.cassa .metro i { display: block; height: 100%; width: 0; background: var(--tema); transition: width 300ms var(--curva); }
+.cassa .metro i { display: block; height: 100%; width: 0; background: var(--tema); transition: width calc(600ms * var(--vel, 1)) var(--curva); }   /* --vel: il moltiplicatore di anima.js */
 .cassa.fatto .metro i { background: linear-gradient(90deg, var(--tema), #FFE08A); }
 .cassa .sotto { font: 600 .74rem/1.1 var(--testo); color: var(--tenue); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
 .cassa.fatto .sotto { color: var(--tema); }
@@ -101,7 +108,10 @@ h2 { text-transform: uppercase; letter-spacing: .03em; }
 .mano .vuota { grid-column: 1 / -1; color: var(--tenue); text-align: center; padding: 18px 0; border: 2px dashed var(--tenue); }
 
 /* I numeri (cassa, monete, prezzi, round) stanno in Barlow, non nel carattere a pixel: a pixel il 5 si legge come una S (foto del 25/10). */
-/* I TASTI: Gioca dice la combinazione e i punti (il tasto unico di Il Lupo); Scarta accanto, più stretto */
+/* I TASTI: Gioca dice la combinazione e i punti (il tasto unico di Il Lupo); Scarta accanto, più stretto.
+   La riga dei tasti ha da subito l'altezza del caso più alto (due righe più la riga piccola «il jolly fa da…» / «×2»): toccare una carta
+   non la fa crescere né salire. */
+.azioni button { min-height: 80px; }
 .azioni .gioca { flex: 2.3; }
 .azioni .gioca.spenta { background: transparent; border: 2px dashed var(--tenue); color: var(--tenue); clip-path: none; font-weight: 600; letter-spacing: .03em; }
 .azioni .scarta { flex: 1; }
@@ -194,12 +204,13 @@ body.copertina .pannello p { color: var(--tenue); }
 .lampo b { display: block; font: 700 1.7rem/1 var(--titolo); text-transform: uppercase; letter-spacing: .03em; }
 .lampo span { display: block; font: 700 1.1rem/1.2 var(--testo); color: #8A5A05; margin-top: 2px; }
 .punti-volo { position: fixed; font: 700 1.7rem/1 var(--testo); color: var(--tema); text-shadow: 0 2px 0 #000, 0 0 0 #000; opacity: 0; }
-.cassa.colpo .totale { animation: colpo 320ms var(--curva); }
+.cassa.colpo .totale { animation: colpo calc(600ms * var(--vel, 1)) var(--curva); }
 @keyframes colpo { 40% { transform: scale(1.12); color: var(--tema); } }
-/* la pescata: le carte nuove entrano una dopo l'altra (240 ms l'una, 50 ms di scarto); dopo una giocata partono a 320 ms, dopo uno scarto a 120 ms */
-.carta.entra { animation: entra-carta 240ms var(--curva) both; animation-delay: calc(var(--base, 120ms) + var(--i, 0) * 50ms); }
-.mano.dopo-giocata { --base: 320ms; }
-.mano.dopo-scarto { --base: 120ms; }
+/* la pescata: le carte nuove entrano una alla volta (420 ms l'una, 180 ms di scarto); dopo una giocata partono a 900 ms, dopo uno scarto a 250 ms.
+   Tutti i tempi sono moltiplicati per --vel, il moltiplicatore di anima.js (secondo giro, 26/10: Damiano le voleva più lente). */
+.carta.entra { animation: entra-carta calc(420ms * var(--vel, 1)) var(--curva) both; animation-delay: calc((var(--base, 250ms) + var(--i, 0) * 180ms) * var(--vel, 1)); }
+.mano.dopo-giocata { --base: 900ms; }
+.mano.dopo-scarto { --base: 250ms; }
 @keyframes entra-carta { from { transform: translateY(26px) scale(.94); opacity: 0; } }
 .mano.subito .carta.entra { animation: none; }
 body.anima .pezzo, body.anima .strato-vignette, body.anima .passo { visibility: hidden; }
