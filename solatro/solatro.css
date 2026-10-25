@@ -1,5 +1,7 @@
 /*
- * SOLATRO — il tema (Chiara, 25/10/2026). Si carica DOPO comune.css (giochi/design/comune.css).
+ * SOLATRO — il tema, secondo giro (Chiara, 25/10/2026 sera). Si carica DOPO comune.css (giochi/design/comune.css).
+ * Rispetto al primo giro: i valori delle carte nel carattere a pixel (eccezione decisa da Damiano, solo in Solatro); le tessere del negozio
+ * sono tasti che si segnano (stato .segnato) e il tasto unico in fondo paga; gli stili delle animazioni di anima.js (in coda).
  * La forma madre sono LE MONETE: l'autore segna i round con le monetine da un quarto (25 centesimi: il primo traguardo è 25) e copre
  * i bonus comprati con le monetine da dieci. Qui una fascia a tutta larghezza, «il banco», attraversa lo schermo sotto il titolo:
  * la moneta del round, la cassa (punti su traguardo, col suo riempimento), e giocate e scarti come gettoni che si spengono quando li spendi.
@@ -114,7 +116,15 @@ h2 { text-transform: uppercase; letter-spacing: .03em; }
 .spesa .totale { font: 700 3rem/1 var(--testo); color: var(--tema); }
 .spesa .lab { font: 700 .74rem/1 var(--testo); text-transform: uppercase; letter-spacing: .14em; color: var(--tenue); }
 .articoli { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.articolo { background: var(--fondo-2); padding: 10px 10px 10px; display: flex; flex-direction: column; gap: 5px; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); min-width: 0; }
+.articolo { background: var(--fondo-2); padding: 10px 10px 10px; display: flex; flex-direction: column; gap: 5px; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); min-width: 0;
+  border: 0; color: var(--inchiostro); text-align: left; font: inherit; cursor: pointer; min-height: 118px; transition: background 120ms linear; }
+.articolo .stato { font: 700 .76rem/1 var(--testo); text-transform: uppercase; letter-spacing: .1em; color: var(--tenue); min-height: .8rem; margin-top: auto; }
+.articolo.segnato { background: #1D5A4A; outline: 3px solid var(--tema); outline-offset: -3px; }
+.articolo.segnato .stato { color: var(--tema); }
+.articolo.segnato .prezzo { box-shadow: inset 0 0 0 2px var(--oro-scuro), 0 0 0 3px var(--tema), 0 2px 0 #000; }
+.articolo.no { opacity: .55; cursor: default; }
+.articolo.tuo { cursor: default; }
+.articolo.tuo .stato { color: var(--accento); }
 .articolo .testa { display: flex; align-items: center; gap: 8px; }
 .articolo .prezzo { flex: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
   background: radial-gradient(circle at 35% 30%, #FFE08A, var(--tema) 55%, #D9961C); color: var(--su-tema); font: 700 .95rem/1 var(--testo); box-shadow: inset 0 0 0 2px var(--oro-scuro), 0 2px 0 #000; }
@@ -173,6 +183,27 @@ body.pezzi .banco { box-shadow: none; }
 
 /* la copertina: la riga di spiegazione e i tasti come in tutti i giochi; il dorso grande fluttua (comune.css) */
 body.copertina .pannello p { color: var(--tenue); }
+
+/* LE ANIMAZIONI (anima.js). Lo strato sta sopra tutto e non prende tocchi; i cloni delle carte giocate ci volano dentro. */
+.strato-anima { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
+.strato-anima .carta.volo { display: grid; grid-template-rows: auto 1fr; }
+.strato-anima .carta .v { justify-self: start; padding: 5px 0 0 7px; font: 700 1.2rem/1 var(--testo); }
+.strato-anima .carta .s { align-self: center; justify-self: center; font-size: 2.1rem; margin-top: -8px; }
+.lampo { position: fixed; transform: translate(-50%, -50%); background: var(--carta); color: #111; border: 3px solid var(--tema); box-shadow: 6px 6px 0 #000; padding: 10px 20px 11px; text-align: center; white-space: nowrap;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); opacity: 0; }
+.lampo b { display: block; font: 700 1.7rem/1 var(--titolo); text-transform: uppercase; letter-spacing: .03em; }
+.lampo span { display: block; font: 700 1.1rem/1.2 var(--testo); color: #8A5A05; margin-top: 2px; }
+.punti-volo { position: fixed; font: 700 1.7rem/1 var(--testo); color: var(--tema); text-shadow: 0 2px 0 #000, 0 0 0 #000; opacity: 0; }
+.cassa.colpo .totale { animation: colpo 320ms var(--curva); }
+@keyframes colpo { 40% { transform: scale(1.12); color: var(--tema); } }
+/* la pescata: le carte nuove entrano una dopo l'altra (240 ms l'una, 50 ms di scarto); dopo una giocata partono a 320 ms, dopo uno scarto a 120 ms */
+.carta.entra { animation: entra-carta 240ms var(--curva) both; animation-delay: calc(var(--base, 120ms) + var(--i, 0) * 50ms); }
+.mano.dopo-giocata { --base: 320ms; }
+.mano.dopo-scarto { --base: 120ms; }
+@keyframes entra-carta { from { transform: translateY(26px) scale(.94); opacity: 0; } }
+.mano.subito .carta.entra { animation: none; }
+body.anima .pezzo, body.anima .strato-vignette, body.anima .passo { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .carta.entra, .cassa.colpo .totale { animation: none; } .cassa .metro i { transition: none; } }
 
 @media (min-width: 700px) {
   .mano .carta { height: 100px; }

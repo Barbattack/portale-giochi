@@ -6,7 +6,9 @@
  *   'leggi'  ogni riga della bozza è un pezzetto (pezzi.js): cartello in basso, la cosa di cui parla accesa sul tavolo, Ok; l'ultimo Ok fa da Avanti.
  *   'tocca'  prima il perché, a pezzetti; poi il promemoria in alto e la vignetta TOCCA (vignette.js) su una carta per volta, nell'ordine
  *            del copione. Si può toccare solo quella (`permesso`); toccate tutte, si passa al passo dopo.
- *   'tasto'  come 'tocca', ma la vignetta indica un tasto (Gioca, Scarta, Compra, Round 2, il gettone e poi Usa): la mossa va al motore.
+ *   'segna'  come 'tocca', nel negozio: un bonus per volta da segnare (nessuna mossa al motore).
+ *   'tasto'  come 'tocca', ma la vignetta indica un tasto (Gioca, Scarta, il tasto unico del negozio, il gettone e poi Usa): la mossa va al motore;
+ *            la mossa { t:'negozio', compra:[...] } la compone il tavolo: un `compra` per ogni bonus segnato, poi `prossimo`.
  *   'trova'  il perché, poi nessuna vignetta sulle carte (body.trova): il giocatore sceglie; la vignetta compare sul tasto solo quando
  *            il tasto dice la combinazione attesa. Se preme Gioca con un'altra, o Scarta, il gioco risponde con l'aiuto del copione
  *            nel cartello del rifiuto, e la mossa non parte.
@@ -72,8 +74,13 @@
       var id = p.tocca[toccate.length];
       return id ? app.querySelector('.carta[data-id="' + id + '"]') : null;
     }
+    if (p.tipo === 'segna') {
+      var idb = p.segna[toccate.length];
+      return idb ? app.querySelector('.articolo[data-bonus="' + idb + '"]') : null;
+    }
     if (p.tipo === 'tasto') {
       var m = p.mossa;
+      if (m.t === 'negozio') return app.querySelector('.azioni .prossimo');
       if (m.t === 'gioca') return app.querySelector('.azioni .gioca');
       if (m.t === 'scarta') return app.querySelector('.azioni .scarta');
       if (m.t === 'prossimo') return app.querySelector('.azioni .prossimo');
@@ -91,6 +98,7 @@
     if (!okDato && p.tipo !== 'leggi') return false;
     if (p.tipo === 'leggi') return false;
     if (p.tipo === 'tocca') return az.tipo === 'carta' && az.id === p.tocca[toccate.length];
+    if (p.tipo === 'segna') return az.tipo === 'segna' && az.bonus === p.segna[toccate.length];
     if (p.tipo === 'tasto') {
       var m = p.mossa;
       if (m.t === 'usa') return (az.tipo === 'apri' || az.tipo === 'usa') && az.bonus === m.bonus;
@@ -114,6 +122,7 @@
     if (!attivo) return;
     var p = passo();
     if (p.tipo === 'tocca' && az.tipo === 'carta') { toccate.push(az.id); if (toccate.length >= p.tocca.length) avanza(); return; }
+    if (p.tipo === 'segna' && az.tipo === 'segna') { toccate.push(az.bonus); if (toccate.length >= p.segna.length) avanza(); return; }
     if (p.tipo === 'tasto') { var m = p.mossa; if (az.tipo === m.t || (m.t === 'usa' && az.tipo === 'usa')) avanza(); return; }
     if (p.tipo === 'trova' && az.tipo === 'gioca') avanza();
   }
@@ -127,6 +136,8 @@
   function sistema(c) {
     ctx = c;
     if (!attivo || !c) { pulisci(); if (pezzi.attivi()) pezzi.chiudi(); return; }
+    // mentre il tavolo si anima (anima.js) il pezzetto aspetta: la giocata si vede a tavolo acceso, poi arriva il cartello
+    if (self.Anima && self.Anima.attiva()) { pulisci(); self.Anima.poi(function () { if (ctx === c) sistema(c); }); return; }
     var p = passo(), info = INFO[idx];
     var nuovo = idx !== ultimo; ultimo = idx;
     var inPezzi = !okDato && pezzi.mostra(info, nuovo);

@@ -11,6 +11,7 @@
  *
  * Ogni passo ha:
  *   tipo      'leggi'  un cartello da leggere, a pezzetti (pezzi.js), con Ok e alla fine Avanti
+ *             'segna'  (negozio) bonus da toccare per segnarli, uno per volta: si paga dopo, col tasto unico (mossa { t:'negozio', compra:[...] })
  *             'tocca'  carte da toccare, una per volta, indicate dalla vignetta (nessuna mossa al motore: è la scelta)
  *             'tasto'  un tasto da toccare: la mossa arriva al motore (`mossa`), la prova la controlla
  *             'trova'  la mossa la trova il giocatore: il tutorial non indica le carte; accetta solo la combinazione `attesa`, e quando
@@ -20,6 +21,7 @@
  *   pezzi     i pezzetti: ognuno prende una riga della bozza (`riga`) e accende sul tavolo le cose di cui parla (`accendi`)
  *   titolo    (leggi) il titolo del cartello — BOZZA
  *   bozza     il testo — BOZZA, da riscrivere (Penna). Le righe sono i pezzetti; **x** evidenzia.
+ *   segna     (segna) i bonus da segnare, in ordine (id del motore)
  *   tocca     (tocca) le carte da toccare, in ordine (id del motore: C cuori, Q quadri, F fiori, P picche; 1 Asso, 11 Fante, 12 Donna, 13 Re)
  *   mossa     (tasto) la mossa che il motore riceve
  *   attesa    (trova) la combinazione che chiude il passo (id del motore)
@@ -136,30 +138,30 @@
       pezzi: [{ riga: 0, accendi: ['tasto:gioca'] }],
       bozza: 'Gioca: Coppia, 10 punti. Dopo la terza giocata il round si chiude da solo.', mossa: { t: 'gioca', carte: ['P4', 'Q4'] } },
 
-    { tipo: 'leggi', intento: 'Capire il negozio: i punti in più si spendono, un gettone per tipo, i gettoni restano e i punti no.',
-      vede: 'La schermata del negozio: «Round 1 superato, 120 su 25», 95 da spendere, i sei gettoni.',
+    { tipo: 'leggi', intento: 'Capire il negozio: i punti in più si spendono, un gettone per tipo, i gettoni restano e i punti no; si segna, si paga con un tasto.',
+      vede: 'La schermata del negozio: «Round 1 superato, 120 su 25», 95 da spendere, i sei gettoni, in fondo il tasto «Round 2 · perdi i 95 punti rimasti».',
       pezzi: [{ riga: 0, accendi: ['spesa'] }, { riga: 1, accendi: ['articoli'] }, { riga: 2, accendi: ['bonus:giocata-extra', 'bonus:carta-extra'] }],
-      titolo: 'Il negozio', bozza: 'Round 1 superato: 120 punti su 25. I **95 in più** li spendi qui.\nSei gettoni, uno per tipo. Quelli che compri restano tuoi finché non li usi; i punti che non spendi si perdono.\nPrendiamo **Giocata extra**, 75: una giocata in più nel prossimo round. E **Carta extra**, 10: una carta in più in mano.' },
+      titolo: 'Il negozio', bozza: 'Round 1 superato: 120 punti su 25. I **95 in più** li spendi qui.\nSei gettoni, uno per tipo. Quelli che compri restano tuoi finché non li usi; i punti che non spendi si perdono.\nPrendiamo **Giocata extra**, 75: una giocata in più nel prossimo round. E **Carta extra**, 10: una carta in più in mano. Li tocchi per segnarli: si paga dopo, con un tasto solo.' },
 
-    { tipo: 'tasto', intento: 'Comprare un gettone.',
-      vede: 'La vignetta indica Compra sotto Giocata extra.',
+    { tipo: 'segna', intento: 'Segnare un gettone: si tocca, e con un altro tocco si toglie.',
+      vede: 'La vignetta indica Giocata extra.',
       pezzi: [{ riga: 0, accendi: ['bonus:giocata-extra'] }],
-      bozza: 'Tocca **Compra** sotto Giocata extra.', mossa: { t: 'compra', bonus: 'giocata-extra' } },
+      bozza: 'Tocca **Giocata extra** per segnarlo. Se ci ripensi, lo tocchi di nuovo.', segna: ['giocata-extra'] },
 
-    { tipo: 'tasto', intento: 'Comprarne un secondo.',
-      vede: 'Giocata extra è segnato tuo; 20 da spendere; la vignetta indica Compra sotto Carta extra.',
+    { tipo: 'segna', intento: 'Segnarne un secondo, e vedere che i punti da spendere scendono.',
+      vede: 'Giocata extra segnato; 20 da spendere; il tasto dice «Compra Giocata extra, 75 punti»; la vignetta indica Carta extra.',
       pezzi: [{ riga: 0, accendi: ['bonus:carta-extra'] }],
-      bozza: 'E **Compra** sotto Carta extra.', mossa: { t: 'compra', bonus: 'carta-extra' } },
+      bozza: 'E **Carta extra**.', segna: ['carta-extra'] },
 
     { tipo: 'leggi', intento: 'Vedere che i punti non spesi si perdono, e conoscere di nome i due gettoni che salvano.',
-      vede: '10 da spendere; nessun Compra acceso.',
+      vede: '10 da spendere; nessun altro gettone a portata; il tasto dice «Compra 2 bonus, 85 punti · ne perdi 10 · Round 2».',
       pezzi: [{ riga: 0, accendi: ['spesa'] }, { riga: 1, accendi: ['bonus:scudo', 'bonus:punti-in-tasca'] }],
       titolo: 'Quello che resta', bozza: 'Restano 10 punti e niente costa 10 che tu non abbia già: vanno persi. Succede.\nQuando avrai più punti: lo **Scudo** ti salva da un round perso, e i **Punti in tasca** sono una piccola rete di sicurezza.' },
 
-    { tipo: 'tasto', intento: 'Passare al round dopo.',
-      vede: 'Il tasto «Round 2» in fondo, con la riga «perdi i 10 punti rimasti».',
+    { tipo: 'tasto', intento: 'Pagare con un tasto solo e passare al round dopo.',
+      vede: 'Il tasto «Compra 2 bonus, 85 punti · ne perdi 10 · Round 2» in fondo.',
       pezzi: [{ riga: 0, accendi: ['tasto:prossimo'] }],
-      bozza: 'Vai al round 2: il traguardo sale a 50.', mossa: { t: 'prossimo' } },
+      bozza: 'Il tasto dice cosa paghi e cosa perdi. Toccalo: compri i due gettoni e vai al round 2, dove il traguardo sale a 50.', mossa: { t: 'negozio', compra: ['giocata-extra', 'carta-extra'] } },
 
     { tipo: 'leggi', intento: 'Il jolly, quando ne esce uno davvero: va da parte, vale la carta che serve, e il secondo li fa perdere tutti e due.',
       vede: 'Round 2, 0 su 50, 3 giocate; il posto del jolly è pieno, con la stella; 8 carte in mano.',

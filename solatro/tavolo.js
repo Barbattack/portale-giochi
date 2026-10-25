@@ -1,24 +1,25 @@
 /*
- * SOLATRO — IL TAVOLO: lo strato del prototipo che disegna lo stato del motore (Chiara, 25/10/2026).
+ * SOLATRO — IL TAVOLO: lo strato del prototipo che disegna lo stato del motore (Chiara, secondo giro, 25/10/2026).
  * Script di SOLO PROTOTIPO. Legge engine.js del gioco vero in sola lettura e non contiene regole: cambia lo stato solo con Solatro.apply.
- * Prende il posto di app.js dello scheletro (che non ha copertina, tutorial né regolette): Erbottega porta in app.js questo markup e le
- * classi, e solatro.css così com'è. Le schermate: la domanda «Sai già giocare?» (che copertina.js veste da copertina), il round,
- * il negozio, la fine, le regolette «Come si gioca». Il tutorial lo guida tutorial.js (SolatroTutorial), che questo file interroga:
- * `permesso` prima di ogni gesto, `fatto` dopo, `sistema` dopo ogni ridisegno.
+ * Prende il posto di app.js dello scheletro: Erbottega porta in app.js questo markup e le classi, e solatro.css così com'è.
+ * Rispetto al primo giro (2026-10-25-solatro): (1) nel negozio toccare un bonus lo SEGNA (un altro tocco lo toglie) e un tasto unico
+ * in fondo dice cosa paghi e cosa perdi, compra tutto e chiude il negozio; (2) le animazioni di giocata e scarto (anima.js);
+ * (3) i valori delle carte nel carattere a pixel (solo CSS).
  */
 (function () {
   'use strict';
-  var S = self.Solatro, C = self.SolatroCopione, T = self.SolatroTutorial || null;
+  var S = self.Solatro, C = self.SolatroCopione, T = self.SolatroTutorial || null, A = self.Anima || null;
   var app = document.getElementById('app');
   var CHIAVE = 'solatro-record', VISTO = 'solatro-visto';
 
   // I crediti stanno in un punto solo: qui.
   var CREDITI = { gioco: 'Solatro', autore: 'TechDweeb', itch: 'https://techdweeb.itch.io/solatro', youtube: 'https://www.youtube.com/@TechDweeb' };
-  // la riga sotto il titolo in copertina (copertina.js la legge)
   window.CopertinaRiga = 'Otto carte, combinazioni di poker, un traguardo che sale a ogni round. Un solitario di TechDweeb.';
 
   var schermo;         // 'domanda' | 'gioco' (dentro il gioco decide la fase del motore)
   var g, sel, msg, msgOk, bonusAperto, ricomincia, recordFine, tutorial;
+  var cassaMostra = null;   // durante l'animazione della giocata la cassa mostra ancora i punti di prima
+  var manoPrima = [], pesca = '';   // le carte in mano prima dell'ultima mossa (per far entrare le nuove) e il tipo di pescata
 
   function el(tag, cls, testo) { var e = document.createElement(tag); if (cls) e.className = cls; if (testo != null) e.textContent = testo; return e; }
   function bottone(testo, cls, fn, sotto, aria) {
@@ -31,7 +32,6 @@
   function conTesto(n, uno, molti) { return n + ' ' + (n === 1 ? uno : molti); }
   function leggiRecord() { try { var v = parseInt(localStorage.getItem(CHIAVE), 10); return v > 0 ? v : 0; } catch (e) { return 0; } }
   function scriviRecord(n) { try { localStorage.setItem(CHIAVE, String(n)); } catch (e) { /* niente da fare */ } }
-  function visto() { try { return !!localStorage.getItem(VISTO); } catch (e) { return false; } }
   function scriviVisto() { try { localStorage.setItem(VISTO, '1'); } catch (e) { /* idem */ } }
   function semeIniziale() { var m = /[?&]seme=([^&]+)/.exec(location.search); return m ? decodeURIComponent(m[1]) : Math.random().toString(36).slice(2, 8); }
   function crediti() {
@@ -47,7 +47,7 @@
     f.appendChild(el('p', null, 'Ispirato a Balatro, senza alcun legame ufficiale.'));
   }
 
-  // ---------- la testa: marchio del portale, titolo con la A fatta a carta, i tasti piccoli ----------
+  // ---------- la testa ----------
   var MARCHIO = '<svg class="marchio" viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"/><text x="7" y="12" font-size="9" text-anchor="middle" fill="currentColor">♠</text><text x="19" y="12" font-size="9" text-anchor="middle" fill="currentColor">♥</text><text x="7" y="23" font-size="9" text-anchor="middle" fill="currentColor">♣</text><text x="19" y="23" font-size="9" text-anchor="middle" fill="currentColor">♦</text></svg>';
   function titolo() {
     var h = el('h1'); h.setAttribute('aria-label', 'Solatro');
@@ -75,7 +75,7 @@
     return t;
   }
 
-  // ---------- la domanda (copertina.js la veste da copertina: Gioca / Tutorial) ----------
+  // ---------- la domanda (copertina.js la veste da copertina) ----------
   function schermoDomanda() {
     app.appendChild(intestazione());
     var p = el('div', 'pannello');
@@ -88,7 +88,8 @@
   }
   function comincia(seme, opzioni) {
     g = S.nuova(seme, opzioni);
-    sel = { carte: [], jolly: false }; bonusAperto = null; ricomincia = false; recordFine = null; tutorial = false;
+    sel = { carte: [], jolly: false, bonus: [] }; bonusAperto = null; ricomincia = false; recordFine = null; tutorial = false;
+    cassaMostra = null; manoPrima = []; pesca = '';
     schermo = 'gioco'; msg = messaggioRound(g.ultimo, g); msgOk = !!msg; render();
   }
   function vaiTutorial() {
@@ -129,7 +130,7 @@
 
   // ---------- il round ----------
   function lettura() { return S.leggiGiocata(g, sel.carte, sel.jolly); }
-  function togliSelezione() { sel = { carte: [], jolly: false }; }
+  function togliSelezione() { sel.carte = []; sel.jolly = false; }
   function tocca(id) {
     var ok = permesso({ tipo: 'carta', id: id }); if (ok !== true) return;
     msg = ''; msgOk = false; bonusAperto = null;
@@ -152,25 +153,38 @@
     if (n.rifiuto) { msg = n.rifiuto; msgOk = false; render(); return n; }
     g = n; return n;
   }
+  // la cassa torna ai numeri veri (dopo l'animazione, o subito): ritocca il DOM senza ridisegnare
+  function aggiornaCassa() {
+    cassaMostra = null;
+    var c = app.querySelector('.banco .cassa'); if (!c || g.fase !== 'round') return;
+    var nuovo = cassa(g.punti, g.traguardo); c.parentNode.replaceChild(nuovo, c);
+  }
   function giocaScelta() {
     var ok = permesso({ tipo: 'gioca' });
     if (ok !== true) { if (typeof ok === 'string') { msg = ok; msgOk = false; render(); } return; }
+    var prima = A ? A.prima(app, sel.carte) : null, puntiPrima = g.punti, mano0 = g.mano.map(function (c) { return c.id; });
     var n = esegui({ t: 'gioca', carte: sel.carte.slice(), jolly: sel.jolly });
     if (n.rifiuto) return;
     togliSelezione(); bonusAperto = null; msgOk = true; msg = riassuntoGiocata(g.ultimo);
     if (g.ultimo.chiusura && g.fase === 'fine') chiudiPartita();
     if (g.fase !== 'round') msg = '';
-    fatto({ tipo: 'gioca' }); render();
+    var u = g.ultimo;
+    if (g.fase === 'round' && A && !A.ridotto) { cassaMostra = { punti: puntiPrima }; manoPrima = mano0; pesca = 'dopo-giocata'; A.prenota(); }
+    fatto({ tipo: 'gioca' }); render(); pesca = ''; manoPrima = [];
+    if (A) { if (g.fase === 'round') A.giocata(app, prima, { nome: u.nome, punti: u.punti, aggiornaCassa: aggiornaCassa }); else A.annulla(); }
   }
   function scartaScelta() {
     var ok = permesso({ tipo: 'scarta' });
     if (ok !== true) { if (typeof ok === 'string') { msg = ok; msgOk = false; render(); } return; }
+    var prima = A ? A.prima(app, sel.carte) : null, mano0 = g.mano.map(function (c) { return c.id; });
     var n = esegui({ t: 'scarta', carte: sel.carte.slice() });
     if (n.rifiuto) return;
     var k = g.ultimo.carte.length;
     togliSelezione(); bonusAperto = null; msgOk = true;
     msg = ('Scartate ' + k + ', pescate ' + k + '. ' + eventiJolly(g.ultimo.eventi)).trim();
-    fatto({ tipo: 'scarta' }); render();
+    if (A && !A.ridotto) { manoPrima = mano0; pesca = 'dopo-scarto'; A.prenota(); }
+    fatto({ tipo: 'scarta' }); render(); pesca = ''; manoPrima = [];
+    if (A) A.scarto(app, prima);
   }
   function apriBonus(id) {
     if (permesso({ tipo: 'apri', bonus: id }) !== true) return;
@@ -196,13 +210,13 @@
     recordFine = { vecchio: vecchio, nuovo: nuovo };
   }
 
-  // IL BANCO: la moneta del round, la cassa, i gettoni di giocate e scarti. Ogni numero viene dallo stato.
+  // IL BANCO
   function moneteRound(round) {
     var m = el('div', 'monete'); m.setAttribute('aria-label', 'Round ' + round);
     m.appendChild(el('span', 'lab', 'Round'));
     m.appendChild(el('span', 'moneta', String(round)));
     var fila = el('span', 'fila'); fila.setAttribute('aria-hidden', 'true');
-    for (var k = 1; k < round; k++) fila.appendChild(el('i'));   // una monetina per ogni round già superato
+    for (var k = 1; k < round; k++) fila.appendChild(el('i'));
     m.appendChild(fila);
     return m;
   }
@@ -225,14 +239,13 @@
   function banco() {
     var b = el('div', 'banco');
     b.appendChild(moneteRound(g.round));
-    b.appendChild(cassa(g.punti, g.traguardo));
+    b.appendChild(cassa(cassaMostra ? cassaMostra.punti : g.punti, g.traguardo));
     var c = el('div', 'conteggi');
     c.appendChild(gettoniConto('Giocate', g.giocate, 'giocate'));
     c.appendChild(gettoniConto('Scarti', g.scartiRimasti, 'scarti'));
     b.appendChild(c);
     return b;
   }
-  // LA RISERVA: il jolly da parte e i gettoni comprati, sempre in vista
   function riserva() {
     var r = el('div', 'riserva');
     if (g.jolly) {
@@ -260,7 +273,7 @@
     var e = el('button', 'carta' + (rosso ? ' R' : '')); e.type = 'button';
     e.setAttribute('data-id', c.id); e.setAttribute('aria-label', S.nomeCarta(c));
     e.appendChild(el('span', 'v', S.etichettaValore(c.valore)));
-    e.appendChild(el('span', 's', S.SIMBOLO_SEME[c.seme] + '︎'));   // FE0E: sempre il simbolo, mai la faccina colorata
+    e.appendChild(el('span', 's', S.SIMBOLO_SEME[c.seme] + '︎'));
     return e;
   }
   function testoChiusura() {
@@ -272,12 +285,13 @@
     app.appendChild(banco());
     riserva();
     app.appendChild(el('div', 'msg' + (msgOk ? ' ok' : ''), msg));
-    var mano = el('div', 'mano' + (g.mano.length > 8 ? ' nove' : ''));
-    var l = lettura();
+    var mano = el('div', 'mano' + (g.mano.length > 8 ? ' nove' : '') + (pesca ? ' ' + pesca : ''));
+    var l = lettura(), k = 0;
     g.mano.forEach(function (c) {
       var b = faccia(c), scelta = sel.carte.indexOf(c.id) >= 0;
       if (scelta) { b.className += ' scelta' + (l.ok && l.fanno.indexOf(c.id) < 0 ? ' senza' : ''); b.setAttribute('aria-pressed', 'true'); }
       else b.setAttribute('aria-pressed', 'false');
+      if (pesca && manoPrima.indexOf(c.id) < 0) { b.classList.add('entra'); b.style.setProperty('--i', k++); }   // la pescata: le carte nuove entrano
       b.addEventListener('click', function () { tocca(c.id); });
       mano.appendChild(b);
     });
@@ -303,7 +317,32 @@
     app.appendChild(az);
   }
 
-  // ---------- il negozio ----------
+  // ---------- il negozio: si segna, si ripensa, si paga con un tasto solo ----------
+  function spesaSegnata() { return sel.bonus.reduce(function (t, id) { return t + S.BONUS_PER_ID[id].costo; }, 0); }
+  function restano() { return g.negozio.punti - spesaSegnata(); }
+  function segnaBonus(id) {
+    if (permesso({ tipo: 'segna', bonus: id }) !== true) return;
+    msg = ''; msgOk = false;
+    var i = sel.bonus.indexOf(id);
+    if (i >= 0) sel.bonus.splice(i, 1);
+    else {
+      if (g.bonus[id] || S.BONUS_PER_ID[id].costo > restano()) return;   // già tuo, o non ci arrivi (la tessera lo dice)
+      sel.bonus.push(id);
+    }
+    fatto({ tipo: 'segna', bonus: id }); render();
+  }
+  function chiudiNegozio() {
+    if (permesso({ tipo: 'negozio' }) !== true) return;
+    for (var k = 0; k < sel.bonus.length; k++) {
+      var n = S.apply(g, { t: 'compra', bonus: sel.bonus[k] });
+      if (n.rifiuto) { msg = n.rifiuto; msgOk = false; render(); return; }
+      g = n;
+    }
+    sel.bonus = [];
+    var p = esegui({ t: 'prossimo' });
+    if (p.rifiuto) return;
+    togliSelezione(); bonusAperto = null; msg = messaggioRound(g.ultimo, g); msgOk = !!msg; fatto({ tipo: 'negozio' }); render();
+  }
   function schermoNegozio() {
     app.appendChild(intestazione(tastiTesta()));
     var e = g.esito, box = el('div', 'negozio');
@@ -312,41 +351,32 @@
     var c = cassa(e.totale, e.traguardo, false);
     c.insertBefore(el('div', 'titolo', e.esito === 'scudo' ? 'Lo Scudo ti ha fatto passare' : 'Round ' + e.round + ' superato'), c.firstChild);
     b.appendChild(c); box.appendChild(b);
-    var spesa = el('div', 'spesa'); spesa.appendChild(el('span', 'totale', String(g.negozio.punti))); spesa.appendChild(el('span', 'lab', 'da spendere'));
+    var r = restano();
+    var spesa = el('div', 'spesa'); spesa.appendChild(el('span', 'totale', String(r))); spesa.appendChild(el('span', 'lab', 'da spendere'));
     box.appendChild(spesa);
     box.appendChild(el('div', 'msg' + (msgOk ? ' ok' : ''), msg));
     var art = el('div', 'articoli');
     S.BONUS.forEach(function (bo) {
-      var tuo = !!g.bonus[bo.id], manca = bo.costo - g.negozio.punti;
-      var r = el('div', 'articolo' + (tuo ? ' tuo' : '')); r.setAttribute('data-bonus', bo.id);
-      var testa = el('div', 'testa'); testa.appendChild(el('span', 'prezzo', String(bo.costo))); testa.appendChild(el('b', null, bo.nome)); r.appendChild(testa);
-      r.appendChild(el('span', 'eff', bo.effetto));
-      var btn;
-      if (tuo) btn = bottone('Tuo', 'tuo', null, null, bo.nome + ', già tuo');
-      else if (manca > 0) btn = bottone('mancano ' + manca, 'no', null, null, bo.nome + ': mancano ' + manca + ' punti');
-      else btn = bottone('Compra', null, function () { compra(bo.id); }, null, 'Compra');
-      btn.setAttribute('data-bonus', bo.id); r.appendChild(btn); art.appendChild(r);
+      var tuo = !!g.bonus[bo.id], segnato = sel.bonus.indexOf(bo.id) >= 0, manca = bo.costo - r;
+      var stato = tuo ? 'tuo' : segnato ? 'segnato' : manca > 0 ? 'no' : '';
+      var t = el('button', 'articolo' + (stato ? ' ' + stato : '')); t.type = 'button'; t.setAttribute('data-bonus', bo.id);
+      t.setAttribute('aria-label', bo.nome); t.setAttribute('aria-pressed', segnato ? 'true' : 'false');
+      var testa = el('div', 'testa'); testa.appendChild(el('span', 'prezzo', String(bo.costo))); testa.appendChild(el('b', null, bo.nome)); t.appendChild(testa);
+      t.appendChild(el('span', 'eff', bo.effetto));
+      t.appendChild(el('span', 'stato', tuo ? 'tuo' : segnato ? 'segnato' : manca > 0 ? 'mancano ' + manca : ''));
+      if (!tuo && (segnato || manca <= 0)) t.addEventListener('click', function () { segnaBonus(bo.id); });
+      art.appendChild(t);
     });
     box.appendChild(art);
-    var az = el('div', 'azioni');
-    az.appendChild(bottone('Round ' + (g.round + 1), 'conferma prossimo', prossimo, g.negozio.punti > 0 ? 'perdi i ' + g.negozio.punti + ' punti rimasti' : null, 'Round ' + (g.round + 1)));
+    var az = el('div', 'azioni'), k = sel.bonus.length, prossimo = 'Round ' + (g.round + 1);
+    if (!k) az.appendChild(bottone(prossimo, 'conferma prossimo', chiudiNegozio, r > 0 ? 'perdi i ' + r + ' punti rimasti' : null, prossimo));
+    else az.appendChild(bottone('Compra ' + (k === 1 ? S.BONUS_PER_ID[sel.bonus[0]].nome : k + ' bonus') + ', ' + conTesto(spesaSegnata(), 'punto', 'punti'), 'conferma prossimo', chiudiNegozio,
+      (r > 0 ? 'ne perdi ' + r + ' · ' : '') + prossimo, 'Compra'));
     box.appendChild(az);
     app.appendChild(box);
   }
-  function compra(id) {
-    if (permesso({ tipo: 'compra', bonus: id }) !== true) return;
-    var n = esegui({ t: 'compra', bonus: id });
-    if (n.rifiuto) return;
-    msgOk = true; msg = S.BONUS_PER_ID[id].nome + ' è tuo.'; fatto({ tipo: 'compra', bonus: id }); render();
-  }
-  function prossimo() {
-    if (permesso({ tipo: 'prossimo' }) !== true) return;
-    var n = esegui({ t: 'prossimo' });
-    if (n.rifiuto) return;
-    togliSelezione(); bonusAperto = null; msg = messaggioRound(g.ultimo, g); msgOk = !!msg; fatto({ tipo: 'prossimo' }); render();
-  }
 
-  // ---------- la fine: le monete vinte, il round, il grado ----------
+  // ---------- la fine ----------
   function schermoFine() {
     app.appendChild(intestazione());
     var f = g.fine, e = g.esito, p = el('div', 'pannello fine');
@@ -372,10 +402,10 @@
     app.appendChild(p);
   }
 
-  // ---------- le regolette: «Come si gioca», una schermata sola (icone qui, testi nel copione) ----------
+  // ---------- le regolette ----------
   var ICONE = {
     scopo: '<svg viewBox="0 0 64 56"><g font-family="Barlow,sans-serif" font-weight="700" font-size="9" text-anchor="middle"><circle cx="12" cy="42" r="10" fill="#F2B233" stroke="#B57A10" stroke-width="2"/><text x="12" y="45" fill="#1A1206">25</text><circle cx="32" cy="30" r="10" fill="#F2B233" stroke="#B57A10" stroke-width="2"/><text x="32" y="33" fill="#1A1206">50</text><circle cx="52" cy="18" r="10" fill="#F2B233" stroke="#B57A10" stroke-width="2"/><text x="52" y="21" fill="#1A1206">75</text></g></svg>',
-    giocata: '<svg viewBox="0 0 64 56"><g font-family="Barlow,sans-serif" font-weight="700" font-size="9"><rect x="2" y="12" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="8.5" y="26" fill="#D1202F" text-anchor="middle">7</text><rect x="14" y="10" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="20.5" y="24" fill="#141414" text-anchor="middle">7</text><rect x="26" y="8" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="32.5" y="22" fill="#141414" text-anchor="middle">7</text><rect x="38" y="10" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="44.5" y="24" fill="#D1202F" text-anchor="middle">Q</text><rect x="50" y="12" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="56.5" y="26" fill="#141414" text-anchor="middle">Q</text><text x="32" y="53" fill="#F2B233" font-size="10" text-anchor="middle" font-family="Pixelify Sans,monospace">FULL 60</text></g></svg>',
+    giocata: '<svg viewBox="0 0 64 56"><g font-family="Pixelify Sans,monospace" font-weight="700" font-size="9"><rect x="2" y="12" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="8.5" y="26" fill="#D1202F" text-anchor="middle">7</text><rect x="14" y="10" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="20.5" y="24" fill="#141414" text-anchor="middle">7</text><rect x="26" y="8" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="32.5" y="22" fill="#141414" text-anchor="middle">7</text><rect x="38" y="10" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="44.5" y="24" fill="#D1202F" text-anchor="middle">Q</text><rect x="50" y="12" width="13" height="30" rx="2" fill="#FBF7EC"/><text x="56.5" y="26" fill="#141414" text-anchor="middle">Q</text><text x="32" y="53" fill="#F2B233" font-size="10" text-anchor="middle">FULL 60</text></g></svg>',
     scarto: '<svg viewBox="0 0 64 56"><rect x="6" y="6" width="16" height="22" rx="2" fill="#FBF7EC" opacity=".5"/><rect x="24" y="6" width="16" height="22" rx="2" fill="#FBF7EC" opacity=".5"/><polygon points="12,32 18,32 15,40 20,40 13,50 14,42 9,42" fill="#FF3D8A"/><rect x="38" y="30" width="16" height="22" rx="2" fill="#FBF7EC"/><rect x="44" y="26" width="16" height="22" rx="2" fill="#FBF7EC"/><polygon points="34,12 42,20 34,20" fill="#F2B233" transform="rotate(180 38 16)"/></svg>',
     punti: '<svg viewBox="0 0 64 56"><g font-family="Pixelify Sans,monospace" font-weight="700" font-size="7.5" fill="#F6F1E3"><text x="4" y="12">COPPIA</text><text x="60" y="12" text-anchor="end" fill="#F2B233">10</text><text x="4" y="24">TRIS</text><text x="60" y="24" text-anchor="end" fill="#F2B233">30</text><text x="4" y="36">FULL</text><text x="60" y="36" text-anchor="end" fill="#F2B233">60</text><text x="4" y="48">POKER</text><text x="60" y="48" text-anchor="end" fill="#F2B233">100</text></g></svg>',
     jolly: '<svg viewBox="0 0 64 56"><rect x="20" y="4" width="24" height="34" rx="3" fill="#FBF7EC"/><path d="M32 10l3.2 6.9 7.6.8-5.6 5.1 1.6 7.5-6.8-3.8-6.8 3.8 1.6-7.5-5.6-5.1 7.6-.8z" fill="#FF3D8A"/><rect x="8" y="42" width="48" height="8" rx="2" fill="#154238" stroke="#9EC2B1" stroke-dasharray="3 2"/></svg>',
