@@ -53,8 +53,8 @@ done
 for g in "${ALTRI[@]}"; do
   mkdir -p "$g"
   for f in "${FILE[@]}"; do cp "../$g/$f" "$g/$f"; done
-  # il-lupo ha il tutorial a pezzetti dentro il gioco (24/10/2026): copione dei testi, pezzi e vignette comuni (copie nella radice del gioco), tutorial.js
-  if [ "$g" = il-lupo ]; then for f in copione.js tutorial.js pezzi.js vignette.js; do cp "../$g/$f" "$g/$f"; done; fi
+  # il-lupo (24/10/2026) e skyway (25/10/2026) hanno il tutorial a pezzetti dentro il gioco: copione dei testi, pezzi e vignette comuni (copie nella radice del gioco), tutorial.js
+  if [ "$g" = il-lupo ] || [ "$g" = skyway ]; then for f in copione.js tutorial.js pezzi.js vignette.js; do cp "../$g/$f" "$g/$f"; done; fi
   noindex "$g/index.html"
   echo "copiato: $g"
 done

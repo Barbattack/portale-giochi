@@ -220,6 +220,18 @@
     return s;
   }
 
+  /*
+   * cosaCade(stato, pila, casella) — pura: le carte che cadrebbero (dal fondo) se si posasse quella pila su quella casella.
+   * Elenco vuoto se non cade niente, o se la pila o la casella non vanno bene. Non cambia lo stato. È lo stesso conto di apply.
+   */
+  function cosaCade(stato, pila, casella) {
+    if (typeof pila !== 'number' || pila !== Math.floor(pila) || pila < 0 || pila >= stato.mercato.length) return [];
+    if (typeof casella !== 'number' || casella !== Math.floor(casella) || casella < 0 || casella >= LATO * LATO) return [];
+    if (!stato.mercato[pila].length) return [];
+    var tot = stato.griglia[casella].length + stato.mercato[pila].length;
+    return stato.griglia[casella].concat(stato.mercato[pila]).slice(0, Math.max(0, tot - ALTEZZA));
+  }
+
   function tutte(s) {                // tutte le carte del tavolo, per le prove
     var a = s.mazzo.concat(s.scarti);
     s.mercato.forEach(function (p) { a = a.concat(p); });
@@ -228,7 +240,7 @@
   }
 
   return {
-    nuova: nuova, apply: apply, sequenza: sequenza, sequenze: sequenze, vicine: vicine, tutte: tutte,
+    nuova: nuova, apply: apply, cosaCade: cosaCade, sequenza: sequenza, sequenze: sequenze, vicine: vicine, tutte: tutte,
     carta: carta, daId: daId, mazzoCompleto: mazzoCompleto,
     etichetta: etichetta, nomeValore: nomeValore, nomeCarta: nomeCarta, sigla: sigla,
     GIRI: GIRI, ALTEZZA: ALTEZZA, LATO: LATO, MERCATO: MERCATO, LUNGHEZZA_VINCENTE: LUNGHEZZA_VINCENTE,
