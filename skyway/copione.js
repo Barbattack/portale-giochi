@@ -68,7 +68,7 @@
           accendi: ['carta:H2', 'carta:H5', 'carta:H6', 'carta:H8'], acceso: 'gli stessi quattro cuori' },
         { testo: 'Caselle **vicine** sono quelle che si toccano di lato: a destra, a sinistra, in alto, in basso. In diagonale no: il 5♥ e l\'8♥ non sono vicini, li unisce il 6♥, che li tocca tutti e due di lato.',
           accendi: ['carta:H5', 'carta:H8'], acceso: 'il 5♥ e l\'8♥' },
-        { testo: 'In una casella le carte stanno una sull\'altra: quella più a destra è in cima, le altre sono sotto e se ne vede solo l\'angolo. Il 5♥ è sotto il 9♣, e per la strada conta lo stesso.',
+        { testo: 'In una casella le carte stanno una sull\'altra, ma sullo schermo le vedi in fila: a sinistra quella in fondo, a destra quella in cima. Il 5♥ è sotto il 9♣, e per la strada conta lo stesso.',
           accendi: ['carta:H5', 'carta:C9'], acceso: 'il 5♥ e il 9♣, nella stessa casella' },
         { testo: 'Una strada può anche tornare in una casella già usata: per esempio 1 in una casella, 4 in quella accanto, 6 di nuovo nella prima. Ma a ogni passo cambia casella: due carte nella stessa casella non sono vicine.',
           accendi: ['griglia'], acceso: 'la griglia' },

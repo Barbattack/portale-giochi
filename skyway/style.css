@@ -1,7 +1,7 @@
 /* Aspetto provvisorio: lo stile comune a tutti i giochi arriverà dopo. */
 :root {
   --sfondo: #1f2a24; --pannello: #2b3a32; --testo: #f3efe4; --tenue: #aab8ae;
-  --carta: #fbf8ef; --nero: #1c1c1c; --rosso: #c0392b; --evid: #e6b84a; --ok: #6bbf8a; --no: #e0594a;
+  --carta: #fbf8ef; --picche: #1c1c1e; --cuori: #d42a24; --quadri: #1f5bd0; --fiori: #00806a; --piatto: rgba(255, 255, 255, .07); --posto: rgba(0, 0, 0, .20); --nero: #1c1c1c; --evid: #e6b84a; --ok: #6bbf8a; --no: #e0594a;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -24,7 +24,7 @@ h2 { margin: 6px 0; font-size: 1.2rem; }
 .segnalino { width: 26px; height: 36px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center;
   line-height: 1; font-weight: 700; font-size: .78rem; }
 .segnalino.su { background: var(--carta); color: var(--nero); }
-.segnalino.su.H, .segnalino.su.D { color: var(--rosso); }
+.segnalino.su.S { color: var(--picche); } .segnalino.su.H { color: var(--cuori); } .segnalino.su.D { color: var(--quadri); } .segnalino.su.C { color: var(--fiori); }
 .segnalino.giu { background-color: #3c68ad; border: 2px solid #d6e4f7;
   background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 3px, transparent 3px 7px),
                     repeating-linear-gradient(-45deg, rgba(255,255,255,.18) 0 3px, transparent 3px 7px); }
@@ -36,29 +36,36 @@ h2 { margin: 6px 0; font-size: 1.2rem; }
 .mucchio b { color: var(--testo); font-size: 1rem; min-width: 1.3em; }
 
 /* le zone: mercato e griglia sono tre colonne di caselle uguali */
-.etichetta { margin: 10px 2px 3px; color: var(--tenue); font-size: .8rem; }
-.zona { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-.griglia { margin-top: 4px; }
+.etichetta { margin: 12px 2px 5px; color: var(--tenue); font-size: .8rem; }
+.zona { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.griglia { margin-top: 0; }
 
-/* il ventaglio: le carte stanno una sopra l'altra, spostate a destra, in modo che si legga ogni valore e ogni seme */
-.ventaglio { position: relative; display: block; width: 100%; aspect-ratio: 115 / 86; padding: 0; border-radius: 8px;
-  border: 2px dashed #5d7366; background: transparent; container-type: inline-size; }
-.ventaglio.pieno { border-color: transparent; background: rgba(255,255,255,.06); }
-.ventaglio .carta { position: absolute; top: 0; bottom: 0; width: 52%; background: var(--carta); color: var(--nero);
-  border-radius: 7px; border: 1px solid #b9b5a8; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
-  padding: 2px 0 0 3px; line-height: 1.02; font-weight: 700; text-align: left; box-shadow: -1px 0 2px rgba(0,0,0,.25); }
-.ventaglio .carta.H, .ventaglio .carta.D { color: var(--rosso); }
-.ventaglio .carta.i0 { left: 0; } .ventaglio .carta.i1 { left: 24%; } .ventaglio .carta.i2 { left: 48%; }
-.ventaglio .carta .v { font-size: 1.05rem; font-size: 12.5cqw; }
-.ventaglio .carta .s { font-size: 1.05rem; font-size: 12.5cqw; }
-.ventaglio .carta.cima { align-items: center; justify-content: center; padding: 0; }
-.ventaglio .carta.cima .v { font-size: 1.6rem; font-size: 21cqw; }
-.ventaglio .carta.cima .s { font-size: 1.7rem; font-size: 23cqw; }
+/* il ventaglio: una fila di tre posti. Le carte stanno in fila, dal fondo (a sinistra) alla cima (a destra), tutte della stessa misura:
+   una tessera con il numero sopra e il seme sotto. Quattro colori, uno per seme (inchiostro sulla carta bianca). */
+.ventaglio { position: relative; display: flex; align-items: stretch; gap: 3px; width: 100%; padding: 4px; border: 0; border-radius: 8px;
+  background: var(--piatto); container-type: inline-size; }
+.ventaglio .carta { position: relative; flex: 0 0 calc((100% - 6px) / 3); aspect-ratio: 2 / 3; padding: 0; border: 0; border-radius: 5px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+  background: var(--carta); color: var(--nero); box-shadow: 0 1px 0 rgba(0, 0, 0, .45); font-weight: 700; line-height: 1; text-align: center; }
+.ventaglio .carta.S { color: var(--picche); }
+.ventaglio .carta.H { color: var(--cuori); }
+.ventaglio .carta.D { color: var(--quadri); }
+.ventaglio .carta.C { color: var(--fiori); }
+.ventaglio .carta .v { font-size: 1.3rem; font-size: 22cqw; letter-spacing: -.04em; }
+.ventaglio .carta .s { font-size: 1.1rem; font-size: 19cqw; margin-top: .06em; }
 .ventaglio .carta.evid { outline: 3px solid var(--evid); outline-offset: -3px; background: #fff3cf; }
-.ventaglio .carta.evid.cima { outline-offset: -3px; }
-.ventaglio.vuotoMercato { border-style: dotted; opacity: .5; }
+/* un posto vuoto: si vede dove c'è ancora spazio, e che una casella ne ha tre */
+.ventaglio .posto { flex: 0 0 calc((100% - 6px) / 3); aspect-ratio: 2 / 3; border-radius: 5px; background: var(--posto); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35); }
+/* la carta che cadrebbe con la posa scelta: pende fuori dalla casella, col suo colore e il suo numero */
+.ventaglio .carta.cade { z-index: 2; transform: translate(-3px, 7px) rotate(-14deg); box-shadow: 0 4px 6px rgba(0, 0, 0, .55);
+  animation: pende 220ms cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes pende { from { transform: none; } to { transform: translate(-3px, 7px) rotate(-14deg); } }
+@media (prefers-reduced-motion: reduce) { .ventaglio .carta.cade { animation: none; } }
+/* a fine partita la pila vuota tiene l'altezza di una carta */
+.ventaglio.vuotoMercato { opacity: .35; }
+.ventaglio.vuotoMercato::before { content: ''; flex: 0 0 calc((100% - 6px) / 3); aspect-ratio: 2 / 3; }
 .ventaglio.scelta { box-shadow: 0 0 0 3px var(--evid); }
-.ventaglio.ultima { box-shadow: 0 0 0 3px var(--ok); }
+.ventaglio.ultima { box-shadow: 0 0 0 2px rgba(243, 239, 228, .75); }
 .ventaglio.suggerita { box-shadow: 0 0 0 3px var(--evid); animation: pulsa 1.2s ease-in-out infinite; }
 @keyframes pulsa { 50% { box-shadow: 0 0 0 6px var(--evid); } }
 @media (prefers-reduced-motion: reduce) { .ventaglio.suggerita { animation: none; } }
@@ -92,7 +99,7 @@ h2 { margin: 6px 0; font-size: 1.2rem; }
   background: #34463c; border: 2px solid #4b5f53; border-radius: 10px; padding: 6px 8px; min-height: 48px; }
 .riga[aria-pressed="true"] { border-color: var(--evid); }
 .riga .sg { font-size: 1.6rem; text-align: center; line-height: 1; }
-.riga.H .sg, .riga.D .sg { color: #ff7d6e; }
+.riga.S .sg { color: #f3efe4; } .riga.H .sg { color: #ff7d6e; } .riga.D .sg { color: #8fb2ff; } .riga.C .sg { color: #4fd1b5; }
 .riga .nome { font-size: .8rem; color: var(--tenue); display: block; }
 .riga .val { font-size: 1rem; font-weight: 700; letter-spacing: .02em; }
 .riga .n { font-size: 1.4rem; font-weight: 700; }
@@ -143,6 +150,7 @@ body.pezzi .giri:not(.acceso), body.pezzi .mucchio:not(.acceso), body.pezzi .eti
 @media (prefers-reduced-motion: reduce) { .vignetta, .mira { animation: none !important; } }
 
 @media (min-width: 700px) {
+  .zona { gap: 10px; }
   body { font-size: 18px; }
   #app { padding-top: 20px; }
 }

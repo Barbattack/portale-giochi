@@ -63,6 +63,13 @@
   }
   function nomePila(st, p) { var pila = st.mercato[p]; return 'La pila del ' + S.sigla(pila[pila.length - 1]); }
   function iniziale(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  // le carte che cadrebbero con la posa scelta: lo stesso conto del tasto «Posa qui: cade…» (S.cosaCade), solo con pila e casella scelte
+  function cadeScelta(st, s) {
+    if (s.pila == null || s.casella == null) return null;
+    var o = {};
+    S.cosaCade(st, s.pila, s.casella).forEach(function (c) { o[c.id] = true; });
+    return o;
+  }
   // il tasto unico sotto il tavolo: assente finché non ci sono una pila e una casella
   function posaDi(st, s, click) {
     if (s.pila == null || s.casella == null) return null;
@@ -78,20 +85,22 @@
     return r;
   }
   // ---------- carte, ventaglio, griglia ----------
-  /* Una pila di carte a ventaglio: dal fondo (a sinistra) alla cima (a destra). */
-  function ventaglio(carte, tag, cls, etichetta, evidenzia) {
+  /* Una pila di carte in fila, tutte uguali: dal fondo (a sinistra) alla cima (a destra). `posti`: quanti posti ha la casella (i vuoti si disegnano come incavi);
+     `cade`: gli id delle carte che con la posa scelta cadrebbero (pendono fuori dalla casella). */
+  function ventaglio(carte, tag, cls, etichetta, evidenzia, posti, cade) {
     var e = el(tag, 'ventaglio ' + (carte.length ? 'pieno ' : '') + (cls || ''));
     carte.forEach(function (c, i) {
-      var k = el('span', 'carta ' + c.seme + ' i' + i + (i === carte.length - 1 ? ' cima' : '') + (evidenzia && evidenzia[c.id] ? ' evid' : ''));
+      var k = el('span', 'carta ' + c.seme + ' i' + i + (i === carte.length - 1 ? ' cima' : '') + (evidenzia && evidenzia[c.id] ? ' evid' : '') + (cade && cade[c.id] ? ' cade' : ''));
       k.setAttribute('data-id', c.id);
       k.appendChild(el('span', 'v', S.etichetta(c.valore)));
       k.appendChild(el('span', 's', S.SIMBOLO[c.seme]));
       e.appendChild(k);
     });
+    for (var j = carte.length; j < (posti || 0); j++) { var po = el('span', 'posto'); po.setAttribute('aria-hidden', 'true'); e.appendChild(po); }
     e.setAttribute('aria-label', etichetta + ': ' + (carte.length ? 'dal fondo alla cima ' + carte.map(S.nomeCarta).join(', ') : 'vuota'));
     return e;
   }
-  /* o: { stato, scelte:{pile:{i:classe}, caselle:{i:classe}}, clicPila(i) | null, clicCasella(i) | null, evidenzia:{id:true} } */
+  /* o: { stato, scelte:{pile:{i:classe}, caselle:{i:classe}}, clicPila(i) | null, clicCasella(i) | null, evidenzia:{id:true}, cade:{id:true} (le carte che cadrebbero, nella casella scelta) } */
   function tavolo(o) {
     var st = o.stato, box = el('div'), i, b;
     box.appendChild(el('div', 'etichetta', st.fine ? 'Mercato: la partita è finita' : 'Mercato: prendi una pila'));
@@ -105,13 +114,13 @@
       }(i));
     }
     box.appendChild(mer);
-    box.appendChild(el('div', 'etichetta', 'Griglia: al massimo tre carte per casella'));
+    box.appendChild(el('div', 'etichetta', 'Griglia'));
     var gr = el('div', 'zona griglia');
     var ult = st.ultimo && st.ultimo.azione === 'gioca' ? st.ultimo.casella : -1;
     for (i = 0; i < 9; i++) {
       (function (k) {
         var cl = ((o.scelte.caselle && o.scelte.caselle[k]) || '') + (k === ult && !(o.scelte.caselle && o.scelte.caselle[k]) ? ' ultima' : '');
-        var c = ventaglio(st.griglia[k], o.clicCasella ? 'button' : 'div', cl, 'Casella ' + nomeCasella(k), o.evidenzia);
+        var c = ventaglio(st.griglia[k], o.clicCasella ? 'button' : 'div', cl, 'Casella ' + nomeCasella(k), o.evidenzia, S.ALTEZZA, o.cade);
         if (o.clicCasella) { c.type = 'button'; c.addEventListener('click', function () { o.clicCasella(k); }); c.setAttribute('data-vignetta', iniziale(nomeCasella(k))); }
         gr.appendChild(c);
       }(i));
@@ -234,7 +243,7 @@
     if (sel.pila != null) scelte.pile[sel.pila] = 'scelta';
     if (sel.casella != null) scelte.caselle[sel.casella] = 'scelta';
     app.appendChild(tavolo({
-      stato: g, scelte: scelte, evidenzia: evidenziaSeme(g),
+      stato: g, scelte: scelte, evidenzia: evidenziaSeme(g), cade: cadeScelta(g, sel),
       clicPila: fine ? null : function (i) { sel.pila = sel.pila === i ? null : i; msg = ''; msgOk = false; render(); },
       clicCasella: fine ? null : function (i) { sel.casella = sel.casella === i ? null : i; msg = ''; msgOk = false; render(); }
     }));
@@ -323,7 +332,7 @@
     app.appendChild(info);
     app.appendChild(barra(demo.st));
     app.appendChild(tavolo({
-      stato: demo.st, scelte: scelte, evidenzia: evidenziaSeme(demo.st),
+      stato: demo.st, scelte: scelte, evidenzia: evidenziaSeme(demo.st), cade: attivo ? cadeScelta(demo.st, sel) : null,
       clicPila: attivo ? function (i) { demoTocca(passo, 'pila', i); } : null,
       clicCasella: attivo ? function (i) { demoTocca(passo, 'casella', i); } : null
     }));
