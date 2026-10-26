@@ -4,7 +4,8 @@ html, body { margin: 0; background: #1d1a24; color: #f1ece2; font-family: system
 body { display: flex; justify-content: center; }
 #app { width: 100%; max-width: 420px; padding: 10px 12px 18px; }
 h1 { font-size: 15px; letter-spacing: .12em; margin: 0 0 8px; color: #b9a8d8; font-weight: 700; display: flex; justify-content: space-between; align-items: baseline; }
-h1 small { font-size: 11px; letter-spacing: 0; color: #7d7690; font-weight: 400; }
+h1 .come { margin-left: auto; min-height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: #3d3550; color: #f1ece2; font-size: 13px; font-weight: 700; font-family: inherit; letter-spacing: 0; cursor: pointer; }
+h1 small { margin-right: 10px; font-size: 11px; letter-spacing: 0; color: #7d7690; font-weight: 400; }
 
 .mostro { display: flex; align-items: center; gap: 12px; background: #2a2533; border-radius: 12px; padding: 8px 12px; margin-bottom: 10px; }
 .mostro .carta { width: 44px; height: 62px; font-size: 15px; flex: none; }
@@ -51,3 +52,11 @@ button.fiche { cursor: pointer; }
 .esito.perso { background: #55262a; }
 .esito b { font-size: 20px; display: block; margin-bottom: 2px; }
 .esito small { display: block; color: #d6cfe4; font-size: 13px; margin-top: 4px; }
+
+.guida { position: fixed; inset: 0; background: #1d1a24f2; overflow-y: auto; z-index: 10; display: flex; justify-content: center; cursor: pointer; }
+.guida[hidden] { display: none; }
+.guida-dentro { width: 100%; max-width: 420px; padding: 14px 16px 24px; }
+.guida h2 { margin: 0 0 8px; font-size: 20px; color: #ffd34d; }
+.guida p { margin: 0 0 9px; font-size: 14.5px; line-height: 1.38; color: #e6e0f0; }
+.guida p b { color: #ffd34d; }
+.guida .chiudi { margin-top: 12px; text-align: center; font-size: 13px; color: #9a93ad; border: 1px solid #5b4a8a; border-radius: 10px; padding: 12px; }

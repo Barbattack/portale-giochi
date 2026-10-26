@@ -7,6 +7,22 @@
   var PASSO_MS = 1100;
   var st = {};
 
+  // «Come si conta»: schermata di lettura sopra la mano, si chiude con un tocco ovunque. Testo provvisorio (da rivedere con Penna).
+  var GUIDA = [
+    ['Quanto valgono le carte', 'le figure (J, Q, K) valgono 10, l’Asso 1, le altre il loro numero. Serve solo per i quindici.'],
+    ['Quindici — 2 punti', 'ogni gruppo di carte che sommate fanno 15. Ogni gruppo diverso conta a parte: con 7♥, 7♣ e 8♣, «7♥ + 8♣» e «7♣ + 8♣» sono due quindici.'],
+    ['Coppia — 2 punti', 'due carte dello stesso valore. Tre uguali fanno tre coppie (6 punti), quattro uguali sei coppie (12).'],
+    ['Scala — 1 punto per carta', 'tre o più valori di fila, di qualsiasi seme. L’Asso sta solo sotto il 2. Se nella scala c’è una carta doppia, le scale sono due: 6-7-7-8 sono due scale da tre, 6 punti.'],
+    ['Colore — 1 punto per carta', 'quattro o cinque carte dello stesso seme.'],
+    ['Esempio', '2♣ 6♥ 7♥ 7♣ 8♣. Quindici: 7♥+8♣, 7♣+8♣, 2+6+7♥, 2+6+7♣: quattro quindici, 8 punti. Coppia di 7: 2. Scale 6-7♥-8 e 6-7♣-8: 6. Totale 16.'],
+    ['Come si dichiara', 'tocchi le carte di una combinazione, poi premi cos’è. Quello che dimentichi è perso, e il mostro prende +1 per ogni combinazione dimenticata.']
+  ];
+  var guida = el('div', 'guida'); guida.id = 'guida'; guida.hidden = true;
+  var gi = el('div', 'guida-dentro'); gi.appendChild(el('h2', '', 'Come si conta'));
+  GUIDA.forEach(function (g) { var p = el('p', ''); p.appendChild(el('b', '', g[0] + ': ')); p.appendChild(document.createTextNode(g[1])); gi.appendChild(p); });
+  gi.appendChild(el('div', 'chiudi', 'Tocca per chiudere'));
+  guida.appendChild(gi); guida.addEventListener('click', function () { guida.hidden = true; }); document.body.appendChild(guida);
+
   function seme0() { var h = parseInt((location.hash || '').replace('#', ''), 10); return isNaN(h) ? null : h; }
   function nuovaMano(seme) {
     if (seme == null) seme = Math.floor(Math.random() * 900000) + 100000;
@@ -46,7 +62,7 @@
     disegna();
     if (!st.mancate.length) { st.fase = 'fine'; disegna(); return; }
     st.timer = setInterval(function () {
-      if (st.visti < st.mancate.length) { st.evid = st.mancate[st.visti].idx; st.visti++; st.msg = { t: etichetta(st.mancate[st.visti - 1]) + ': al mostro.', k: '' }; disegna(); }
+      if (st.visti < st.mancate.length) { st.evid = st.mancate[st.visti].idx; st.visti++; st.msg = { t: etichetta(st.mancate[st.visti - 1]) + ': +1 al mostro.', k: '' }; disegna(); }
       else { clearInterval(st.timer); st.timer = null; st.fase = 'fine'; st.evid = []; st.msg = { t: '', k: 'neutro' }; disegna(); }
     }, PASSO_MS);
   }
@@ -54,10 +70,11 @@
 
   function disegna() {
     app.innerHTML = '';
-    var h = el('h1', '', 'CRYBT'); h.appendChild(el('small', '', 'prova del conto · mano ' + st.seme)); app.appendChild(h);
+    var h = el('h1', '', 'CRYBT'); h.appendChild(el('small', '', 'mano ' + st.seme));
+    var cc = el('button', 'come', 'Come si conta'); cc.type = 'button'; cc.id = 'come-si-conta'; cc.addEventListener('click', function () { guida.hidden = false; }); h.appendChild(cc); app.appendChild(h);
 
     var m = el('div', 'mostro'); var cm = carta(st.mostro, { fermo: true }); m.appendChild(cm);
-    var t = el('div', 'testo'); t.appendChild(document.createTextNode('Mostro: carta ' + C.valore(st.mostro) + ' + 1')); t.appendChild(el('b', '', 'Forza ' + st.forza)); m.appendChild(t);
+    var t = el('div', 'testo'); t.appendChild(document.createTextNode('Mostro: carta ' + C.valore(st.mostro) + ' + 1')); var fv = st.forza + (st.fase === 'conto' ? 0 : (st.fase === 'fine' ? st.mancate.length : st.visti)); t.appendChild(el('b', '', 'Forza ' + fv + (fv !== st.forza ? ' (era ' + st.forza + ')' : ''))); m.appendChild(t);
     app.appendChild(m);
 
     var ma = el('div', 'mano'), et = el('div', 'etichette');
@@ -81,7 +98,7 @@
     var vistiLista = st.fase === 'conto' ? [] : st.mancate.slice(0, st.fase === 'fine' ? st.mancate.length : st.visti);
     if (vistiLista.length) fi.appendChild(el('span', 'prende', 'AL MOSTRO'));
     vistiLista.forEach(function (d) {
-      var f = el(st.fase === 'fine' ? 'button' : 'span', 'fiche mostro-prende', etichetta(d));
+      var f = el(st.fase === 'fine' ? 'button' : 'span', 'fiche mostro-prende', etichetta(d) + ' · +1 al mostro');
       if (st.fase === 'fine') { f.type = 'button'; f.addEventListener('click', function () { st.evid = d.idx; disegna(); }); }
       fi.appendChild(f);
     });
@@ -92,7 +109,7 @@
     } else if (st.fase === 'fine') {
       var e = C.esito(st.forza, st.dich, st.mancate), box = el('div', 'esito ' + (e.vinto ? 'vinto' : 'perso'));
       box.appendChild(el('b', '', e.vinto ? 'Mostro sconfitto' : 'Subisci ' + e.danni + (e.danni === 1 ? ' danno' : ' danni')));
-      box.appendChild(document.createTextNode('Hai dichiarato ' + e.tuoi + ' punti' + (e.persi ? ', il mostro ne ha presi ' + e.persi + ': ora vale ' + e.bersaglio + '.' : '; la forza era ' + e.bersaglio + '.')));
+      box.appendChild(document.createTextNode('Hai dichiarato ' + e.tuoi + ' punti' + (e.sfuggite ? '; ' + (e.sfuggite === 1 ? 'è sfuggita una combinazione' : 'sono sfuggite ' + e.sfuggite + ' combinazioni') + ' (' + e.persi + ' punti persi): il mostro ora vale ' + e.bersaglio + '.' : '; la forza era ' + e.bersaglio + '.')));
       var tot = C.totale(C.combinazioni(st.mano));
       box.appendChild(el('small', '', 'La mano ne valeva ' + tot + '.'));
       app.appendChild(box);

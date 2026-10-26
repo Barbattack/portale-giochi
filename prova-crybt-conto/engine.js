@@ -90,11 +90,10 @@
       .sort(function (a, b) { return TIPI.indexOf(a.tipo) - TIPI.indexOf(b.tipo) || a.idx.length - b.idx.length || a.idx.join().localeCompare(b.idx.join()); });
   }
 
-  // Esito. I punti sfuggiti li prende il mostro: la sua forza sale (ALZA_FORZA = false li rende solo punti persi).
-  var ALZA_FORZA = true;
+  // Esito. I punti sfuggiti sono persi (non entrano nel tuo totale); il mostro prende +1 di forza per ogni combinazione sfuggita, non i suoi punti.
   function esito(forza, dichiarate, mancate) {
-    var tuoi = totale(dichiarate), persi = totale(mancate), bersaglio = forza + (ALZA_FORZA ? persi : 0);
-    return { tuoi: tuoi, persi: persi, bersaglio: bersaglio, vinto: tuoi >= bersaglio, danni: Math.max(0, bersaglio - tuoi) };
+    var tuoi = totale(dichiarate), persi = totale(mancate), bersaglio = forza + mancate.length;
+    return { tuoi: tuoi, persi: persi, sfuggite: mancate.length, bersaglio: bersaglio, vinto: tuoi >= bersaglio, danni: Math.max(0, bersaglio - tuoi) };
   }
 
   var API = { TIPI: TIPI, NOMI: NOMI, valore: valore, parola: parola, mazzo: mazzo, dai: dai, riconosci: riconosci, combinazioni: combinazioni,
