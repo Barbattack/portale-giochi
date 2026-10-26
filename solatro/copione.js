@@ -44,7 +44,7 @@
     { tipo: 'leggi', intento: 'Sapere da dove viene il gioco, con le parole dell\'autore: lo zio, le combinazioni, le monetine.',
       vede: 'La prima schermata di una partita vera: la fascia delle monete (round 1, 0 su 25, 3 giocate, 3 scarti), le 8 carte in mano, il tasto spento.',
       pezzi: [{ riga: 0, accendi: [] }, { riga: 1, accendi: ['monete'] }],
-      titolo: 'Da dove viene', bozza: 'Solatro l\'ha inventato TechDweeb per suo zio, un uomo da poker: gli piaceva fare combinazioni per prendere punti, e scappava appena arrivavano le cose da videogioco.\nQui c\'è solo il cuore: otto carte, combinazioni di poker, un traguardo che sale a ogni round. Lui i round li segna con le **monetine**, come chi mette da parte gli spiccioli per la sala giochi.' },
+      titolo: 'Da dove viene', bozza: 'TechDweeb aveva fatto provare Balatro, un videogioco di carte, a suo zio, uno da poker. Allo zio piaceva fare combinazioni per prendere punti; appena spuntavano bustine di carte, buoni e le altre stranezze da videogioco, mollava.\nSolatro tiene solo quello, ed è nato per un mazzo vero: TechDweeb segna i round con una moneta da 25 centesimi ciascuno, come chi mette da parte gli spiccioli per la sala giochi del fine settimana.' },
 
     { tipo: 'leggi', intento: 'Capire come si vince e come si perde, prima di toccare qualsiasi cosa.',
       vede: 'Stessa schermata. La cassa dice 0 su 25.',
@@ -54,7 +54,7 @@
     { tipo: 'leggi', intento: 'Capire cosa si può fare nel round: tre giocate di combinazioni a punti fissi, tre scarti.',
       vede: 'Stessa schermata: 8 carte, 3 gettoni di giocate, 3 gettoni di scarti.',
       pezzi: [{ riga: 0, accendi: ['mano'] }, { riga: 1, accendi: ['giocate'] }, { riga: 2, accendi: ['scarti'] }],
-      titolo: 'Cosa puoi fare', bozza: 'Hai 8 carte in mano.\nHai **3 giocate**: in ogni giocata scegli fino a 5 carte e fai una combinazione di poker. Ogni combinazione vale punti fissi: coppia 10, tris 30, full 60… Il valore delle carte non conta.\nE hai **3 scarti**: butti le carte che non ti servono e ne peschi altre. Uno scarto non consuma una giocata.' },
+      titolo: 'Cosa puoi fare', bozza: 'Hai 8 carte in mano.\nHai **3 giocate**: ogni volta scegli fino a 5 carte e fai una combinazione di poker. Ogni combinazione vale punti fissi (coppia 10, tris 30, full 60…) e il valore delle carte non conta: una coppia di 2 vale quanto una coppia di Assi.\nE hai **3 scarti**: butti le carte che non ti servono e ne peschi altre. Uno scarto non consuma una giocata.' },
 
     { tipo: 'tocca', intento: 'Fare il primo gesto: toccare due carte uguali.',
       vede: 'La vignetta indica il 7 di cuori, poi il 7 di picche.',
@@ -64,17 +64,17 @@
     { tipo: 'leggi', intento: 'Capire il tasto: dice la combinazione e i punti di quello che hai scelto; dice il fatto, non cosa conviene.',
       vede: 'I due 7 alzati col bordo d\'oro; il tasto dice «Gioca: Coppia, 10 punti».',
       pezzi: [{ riga: 0, accendi: ['tasto:gioca'] }],
-      titolo: 'Il tasto', bozza: 'Il tasto ti dice cosa hai in mano: **Coppia, 10 punti**. Dice il fatto, mai cosa conviene.' },
+      titolo: 'Il tasto', bozza: 'Il tasto dice cosa fanno le carte che hai scelto: **Coppia, 10 punti**. Non ti dice se in mano c\'è di meglio: quello lo cerchi tu.' },
 
     { tipo: 'tocca', intento: 'Aggiungere una carta che non c\'entra, per vedere cosa succede.',
       vede: 'La vignetta indica il 3 di fiori.',
       pezzi: [{ riga: 0, accendi: ['carta:F3'] }],
-      bozza: 'Tocca anche il 3 di fiori.', tocca: ['F3'] },
+      bozza: 'Ora tocca anche il 3 di fiori, che con i 7 non c\'entra niente.', tocca: ['F3'] },
 
     { tipo: 'leggi', intento: 'Capire che le carte giocate in più non danno punti ma escono dalla mano, e ne arrivano di nuove.',
       vede: 'Il 3 di fiori alzato ma segnato come carta che non conta (bordo tratteggiato); il tasto dice ancora «Coppia, 10 punti».',
       pezzi: [{ riga: 0, accendi: ['carta:F3', 'tasto:gioca'] }],
-      titolo: 'Le carte in più', bozza: 'Sempre Coppia, 10 punti: il 3 è segnato come carta che **non conta**. Se giochi, esce dalla mano insieme ai 7 e al suo posto ne arriva una nuova. Serve a fare spazio.' },
+      titolo: 'Le carte in più', bozza: 'Sempre **Coppia, 10 punti**: il 3 ha il bordo tratteggiato perché non conta. Però se giochi esce anche lui, e al suo posto ne peschi una nuova: è un modo di cambiare carte senza spendere uno scarto.' },
 
     { tipo: 'tocca', intento: 'Imparare a togliere una scelta: si tocca di nuovo.',
       vede: 'La vignetta indica i due 7 e il 3, uno per volta.',
@@ -84,7 +84,7 @@
     { tipo: 'leggi', intento: 'Il turno ragionato ad alta voce: coppia adesso (10) oppure uno scarto per cercare il colore (50), e cosa costa lo scarto.',
       vede: 'Nessuna carta scelta. I quattro quadri in mano.',
       pezzi: [{ riga: 0, accendi: ['carta:Q13', 'carta:Q9', 'carta:Q5', 'carta:Q2'] }, { riga: 1, accendi: ['traguardo', 'giocate'] }, { riga: 2, accendi: ['carta:F3', 'carta:P11', 'scarti'] }],
-      titolo: 'Gioco, o scarto?', bozza: 'Hai quattro **quadri**. Con un quinto fai **Colore: 50 punti**, cinque volte la coppia.\nLa coppia adesso vale 10. Al round 1 servono 25 punti in 3 giocate: due coppie e una carta alta basterebbero. Ma i punti in più non si perdono: dopo il round si spendono nel **negozio**.\nProviamo il colore. Costa uno scarto su tre: butti il 3 di fiori e il Fante di picche, le due carte che non servono a niente. I 7 restano: se il quadri non arriva, hai ancora la coppia.' },
+      titolo: 'Gioco o scarto?', bozza: 'Hai quattro carte di **quadri**. Con una quinta fai **Colore**, cinque carte dello stesso seme: 50 punti, cinque volte la coppia.\nTi servono 25 punti in 3 giocate. Con la coppia adesso fai 10; poi basterebbero un\'altra coppia e una giocata qualsiasi, perché anche senza combinazioni vale 5: si chiama **Carta alta**. E i punti oltre il traguardo si spendono nel **negozio**, dopo il round.\nProviamo il colore. Costa uno scarto su tre: butti il 3 di fiori e il Fante di picche, le due carte che non servono a niente. I 7 restano: se il quadri non arriva, hai ancora la coppia.' },
 
     { tipo: 'tocca', intento: 'Scegliere le due carte da scartare.',
       vede: 'La vignetta indica il 3 di fiori, poi il Fante di picche.',
@@ -114,7 +114,7 @@
     { tipo: 'leggi', intento: 'Capire che il traguardo è già passato ma conviene continuare: i punti in più si spendono.',
       vede: 'La cassa dice 50 su 25, piena; 2 giocate; cinque carte nuove in mano.',
       pezzi: [{ riga: 0, accendi: ['traguardo'] }, { riga: 1, accendi: ['mano'] }],
-      titolo: '50 su 25', bozza: '50 punti: il traguardo di 25 è già passato, con due giocate ancora davanti.\nNon fermarti: tutto quello che fai in più lo spendi nel negozio, dopo il round. Hai pescato cinque carte nuove.' },
+      titolo: '50 su 25', bozza: '50 su 25: il traguardo è già fatto, e hai ancora due giocate.\nLe giocate si fanno comunque tutte e tre, e ogni punto in più lo spendi nel negozio: vale la pena farne ancora. Intanto hai pescato cinque carte nuove.' },
 
     { tipo: 'trova', intento: 'La mossa la trova il giocatore: nella mano c\'è un full. Il tutorial non lo dice; aiuta solo se sbaglia.',
       vede: 'In mano: 7♥ 7♠ 7♣ Q♥ Q♣ 4♠ 9♣ 2♥. Nessuna vignetta sulle carte; la vignetta sul tasto compare solo quando il tasto dice 60.',
@@ -126,7 +126,7 @@
     { tipo: 'leggi', intento: 'Nominare quello che il giocatore ha trovato, e preparare l\'ultima giocata del round.',
       vede: 'La cassa dice 110 su 25; 1 giocata; in mano 4♠ 9♣ 2♥ 4♦ 8♣ 3♠ 6♥ J♦.',
       pezzi: [{ riga: 0, accendi: ['traguardo'] }, { riga: 1, accendi: ['carta:P4', 'carta:Q4', 'giocate'] }],
-      titolo: 'Full, 60', bozza: '**Full**: tre 7 e due Donne, 60 punti. Sei a 110.\nUltima giocata. Hai una coppia di 4, 10 punti: ogni punto in più è da spendere.' },
+      titolo: 'Full, 60', bozza: '**Full**: tre 7 e due Donne, 60 punti. Sei a 110.\nResta l\'ultima giocata. C\'è una coppia di 4: altri 10 punti per il negozio.' },
 
     { tipo: 'tocca', intento: 'Scegliere la coppia.',
       vede: 'La vignetta indica il 4 di picche, poi il 4 di quadri.',
@@ -136,12 +136,12 @@
     { tipo: 'tasto', intento: 'Fare la terza giocata e vedere che il round si chiude da solo.',
       vede: 'Il tasto dice «Gioca: Coppia, 10 punti».',
       pezzi: [{ riga: 0, accendi: ['tasto:gioca'] }],
-      bozza: 'Gioca: Coppia, 10 punti. Dopo la terza giocata il round si chiude da solo.', mossa: { t: 'gioca', carte: ['P4', 'Q4'] } },
+      bozza: 'Gioca la coppia. È la terza giocata: dopo, il round si chiude da solo e si contano i punti.', mossa: { t: 'gioca', carte: ['P4', 'Q4'] } },
 
     { tipo: 'leggi', intento: 'Capire il negozio: i punti in più si spendono, un gettone per tipo, i gettoni restano e i punti no; si segna, si paga con un tasto.',
       vede: 'La schermata del negozio: «Round 1 superato, 120 su 25», 95 da spendere, i sei gettoni, in fondo il tasto «Round 2 · perdi i 95 punti rimasti».',
       pezzi: [{ riga: 0, accendi: ['spesa'] }, { riga: 1, accendi: ['articoli'] }, { riga: 2, accendi: ['bonus:giocata-extra', 'bonus:carta-extra'] }],
-      titolo: 'Il negozio', bozza: 'Round 1 superato: 120 punti su 25. I **95 in più** li spendi qui.\nSei gettoni, uno per tipo. Quelli che compri restano tuoi finché non li usi; i punti che non spendi si perdono.\nPrendiamo **Giocata extra**, 75: una giocata in più nel prossimo round. E **Carta extra**, 10: una carta in più in mano. Li tocchi per segnarli: si paga dopo, con un tasto solo.' },
+      titolo: 'Il negozio', bozza: 'Round 1 superato: 120 punti su 25. I **95 in più** li spendi qui.\nSei **bonus**, e non se ne possono avere due uguali. Quelli che compri restano tuoi finché non li usi, anche per più round; i punti che non spendi adesso, invece, si perdono.\nPrendiamo **Giocata extra**, 75: una giocata in più nel round che scegli tu. E **Carta extra**, 10: una carta in più in mano. Tocchi i bonus per segnarli; si paga alla fine, con un tasto solo.' },
 
     { tipo: 'segna', intento: 'Segnare un gettone: si tocca, e con un altro tocco si toglie.',
       vede: 'La vignetta indica Giocata extra.',
@@ -156,22 +156,22 @@
     { tipo: 'leggi', intento: 'Vedere che i punti non spesi si perdono, e conoscere di nome i due gettoni che salvano.',
       vede: '10 da spendere; nessun altro gettone a portata; il tasto dice «Compra 2 bonus, 85 punti · ne perdi 10 · Round 2».',
       pezzi: [{ riga: 0, accendi: ['spesa'] }, { riga: 1, accendi: ['bonus:scudo', 'bonus:punti-in-tasca'] }],
-      titolo: 'Quello che resta', bozza: 'Restano 10 punti e niente costa 10 che tu non abbia già: vanno persi. Succede.\nQuando avrai più punti: lo **Scudo** ti salva da un round perso, e i **Punti in tasca** sono una piccola rete di sicurezza.' },
+      titolo: 'Quello che resta', bozza: 'Restano 10 punti. L\'unico bonus da 10 è Carta extra, e l\'hai appena segnato: quei 10 vanno persi. Succede.\nQuando avrai più punti, guarda questi due: lo **Scudo** ti fa passare anche se manchi il traguardo, e i **Punti in tasca** aggiungono 25 punti al round in cui li usi.' },
 
     { tipo: 'tasto', intento: 'Pagare con un tasto solo e passare al round dopo.',
       vede: 'Il tasto «Compra 2 bonus, 85 punti · ne perdi 10 · Round 2» in fondo.',
       pezzi: [{ riga: 0, accendi: ['tasto:prossimo'] }],
-      bozza: 'Il tasto dice cosa paghi e cosa perdi. Toccalo: compri i due gettoni e vai al round 2, dove il traguardo sale a 50.', mossa: { t: 'negozio', compra: ['giocata-extra', 'carta-extra'] } },
+      bozza: 'Il tasto in fondo dice quanto paghi e quanto perdi. Toccalo: compri i due bonus e passi al round 2, dove il traguardo sale a 50.', mossa: { t: 'negozio', compra: ['giocata-extra', 'carta-extra'] } },
 
     { tipo: 'leggi', intento: 'Il jolly, quando ne esce uno davvero: va da parte, vale la carta che serve, e il secondo li fa perdere tutti e due.',
       vede: 'Round 2, 0 su 50, 3 giocate; il posto del jolly è pieno, con la stella; 8 carte in mano.',
       pezzi: [{ riga: 0, accendi: ['jolly'] }, { riga: 1, accendi: ['jolly'] }],
-      titolo: 'Il jolly', bozza: 'Hai pescato un **jolly**: va da parte, qui, e una carta nuova ha preso il suo posto.\nLo aggiungi a una giocata quando vuoi, anche in un round dopo, e diventa da solo la carta che serve. Attento: se ne esce un secondo mentre questo è da parte, li perdi tutti e due.' },
+      titolo: 'Il jolly', bozza: 'Hai pescato un **jolly**: va da parte, qui, e una carta nuova ha preso il suo posto.\nLo usi toccandolo insieme alle carte che giochi, anche in un round dopo: conta come una delle 5 e diventa da solo la carta che dà più punti. Ma se ne peschi un secondo mentre questo è qui, li perdi tutti e due: tenerlo a lungo è un rischio.' },
 
     { tipo: 'tasto', intento: 'Usare un gettone: si tocca, poi Usa.',
       vede: 'I due gettoni comprati, accanto al jolly; la vignetta indica Giocata extra, poi Usa.',
       pezzi: [{ riga: 0, accendi: ['gettoni'] }],
-      bozza: 'I gettoni comprati stanno qui. Usa subito **Giocata extra**: tocca il gettone, poi Usa.', mossa: { t: 'usa', bonus: 'giocata-extra' } },
+      bozza: 'I bonus comprati stanno qui. Usiamo subito **Giocata extra**: tocca il bonus, poi **Usa**. Così hai quattro giocate per arrivare a 50.', mossa: { t: 'usa', bonus: 'giocata-extra' } },
 
     { tipo: 'tasto', intento: 'Usare il secondo gettone.',
       vede: '4 giocate; la vignetta indica Carta extra, poi Usa.',
@@ -181,17 +181,17 @@
     { tipo: 'leggi', intento: 'Chiudere: da qui si continua da soli nella stessa partita; i rifiuti del gioco e «Come si gioca» insegnano il resto.',
       vede: 'Round 2, 0 su 50, 4 giocate, 3 scarti, jolly da parte, nessun gettone.',
       pezzi: [{ riga: 0, accendi: ['traguardo', 'giocate'] }, { riga: 1, accendi: ['tasto:Come si gioca'] }],
-      titolo: 'Ora da solo', bozza: 'Round 2: traguardo 50, 4 giocate, 3 scarti, un jolly da parte. Da qui continui tu.\nQuando una mossa non si può fare, il gioco te lo dice e ti spiega perché. Le regole stanno sempre sotto **Come si gioca**.' }
+      titolo: 'Ora da solo', bozza: 'Round 2: 50 punti in 4 giocate, cioè più di una coppia a giocata. Hai 3 scarti e un jolly da parte. Da qui continui tu.\nQuando una mossa non si può fare, il gioco te lo dice e ti spiega perché. Le regole stanno sempre sotto **Come si gioca**.' }
   ];
 
-  // LE REGOLETTE: «Come si gioca», una schermata sola. [icona, titolo, testo] — BOZZA, da riscrivere (Penna). <i>x</i> evidenzia.
+  // LE REGOLETTE: «Come si gioca», una schermata sola. [icona, titolo, testo]. <i>x</i> evidenzia.
   var REGOLE = [
     ['scopo', 'Un traguardo che sale', 'Ogni round chiede un traguardo di punti: <i>25</i>, poi 50, 75, 100… Lo raggiungi e passi al round dopo; lo manchi e la partita finisce. Il punteggio è il round a cui arrivi.'],
-    ['giocata', 'Tre giocate', 'Hai 8 carte. In ogni giocata scegli fino a <i>5 carte</i> e fai una combinazione di poker: vale punti fissi, il valore delle carte non conta. Le carte in più escono senza dare punti. Dopo ogni giocata ripeschi fino a 8.'],
-    ['scarto', 'Tre scarti', 'Butti da 1 a 5 carte e ne peschi altrettante. Uno scarto <i>non consuma una giocata</i>. Dopo la terza giocata il round si chiude e si sommano i punti.'],
-    ['punti', 'Quanto vale', 'Carta alta 5 · Coppia 10 · Doppia coppia 20 · Tris 30 · Scala 40 · Colore 50 · Full 60 · Poker 100 · Scala colore 125 · Scala reale 150.'],
-    ['jolly', 'Il jolly', 'Se lo peschi va <i>da parte</i> e ne peschi un\'altra. Lo aggiungi a una giocata quando vuoi, anche in un round dopo, e vale la carta che serve. Se ne esce un secondo mentre il primo è da parte, li perdi tutti e due.'],
-    ['negozio', 'Il negozio', 'I punti oltre il traguardo si spendono in gettoni, <i>uno per tipo</i>: li usi quando vuoi, durante un round. I gettoni restano, i punti non spesi si perdono.']
+    ['giocata', 'Tre giocate', 'Hai 8 carte. In ogni giocata scegli fino a <i>5 carte</i> e fai una combinazione di poker: vale punti fissi, il valore delle carte non conta. Le carte in più escono senza dare punti. Dopo ogni giocata la mano si riempie di nuovo; dopo la terza il round si chiude e si sommano i punti.'],
+    ['scarto', 'Tre scarti', 'Butti da 1 a 5 carte e la mano si riempie di nuovo. Uno scarto <i>non consuma una giocata</i>.'],
+    ['punti', 'Quanto vale', 'Carta alta 5 (una giocata senza combinazioni) · Coppia 10 · Doppia coppia 20 · Tris 30 · Scala 40 · Colore 50 · Full 60 · Poker 100 · Scala colore 125 · Scala reale 150.'],
+    ['jolly', 'Il jolly', 'Se lo peschi va <i>da parte</i> e al suo posto peschi un\'altra carta. Lo aggiungi a una giocata quando vuoi, anche in un round dopo: conta come una delle 5 carte e diventa da solo quella che dà più punti. Se ne peschi un secondo mentre il primo è da parte, li perdi tutti e due.'],
+    ['negozio', 'Il negozio', 'Fra un round e l\'altro, i punti oltre il traguardo si spendono in bonus, <i>uno per tipo</i>. Li usi quando vuoi durante un round, e dopo puoi ricomprarli. I bonus restano finché non li usi, i punti non spesi si perdono. Lo Scudo non si usa: scatta da solo quando manchi un traguardo.']
   ];
 
   root.SolatroCopione = { partita: PARTITA, passi: PASSI, regole: REGOLE };

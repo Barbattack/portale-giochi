@@ -56,18 +56,18 @@
   ];
   var COMBO = {}; COMBINAZIONI.forEach(function (c) { COMBO[c.id] = c; });
 
-  // il negozio (regolamento p. 3, «Bonus Shop»). I nomi sono provvisori: li sistema Penna.
+  // il negozio (regolamento p. 3, «Bonus Shop»).
   var BONUS = [
-    { id: 'carta-extra', nome: 'Carta extra', costo: 10, effetto: '+1 carta in mano per il resto del round' },
-    { id: 'scarto-extra', nome: 'Scarto extra', costo: 25, effetto: '+1 scarto in questo round' },
-    { id: 'punti-in-tasca', nome: 'Punti in tasca', costo: 50, effetto: '+25 punti al totale di questo round' },
-    { id: 'giocata-extra', nome: 'Giocata extra', costo: 75, effetto: '+1 giocata in questo round' },
-    { id: 'doppio', nome: 'Doppio punteggio', costo: 100, effetto: 'raddoppia i punti della prossima giocata' },
-    { id: 'scudo', nome: 'Scudo', costo: 150, effetto: 'se manchi un traguardo passi lo stesso' }
+    { id: 'carta-extra', nome: 'Carta extra', costo: 10, effetto: '+1 carta in mano fino a fine round' },
+    { id: 'scarto-extra', nome: 'Scarto extra', costo: 25, effetto: '+1 scarto nel round' },
+    { id: 'punti-in-tasca', nome: 'Punti in tasca', costo: 50, effetto: '+25 punti al totale del round' },
+    { id: 'giocata-extra', nome: 'Giocata extra', costo: 75, effetto: '+1 giocata nel round' },
+    { id: 'doppio', nome: 'Doppio punteggio', costo: 100, effetto: 'la prossima giocata vale doppio' },
+    { id: 'scudo', nome: 'Scudo', costo: 150, effetto: 'se manchi il traguardo, passi lo stesso' }
   ];
   var BONUS_PER_ID = {}; BONUS.forEach(function (b) { BONUS_PER_ID[b.id] = b; });
 
-  // i gradi, per round superati (regolamento p. 3, «Metagame»). Nomi provvisori.
+  // i gradi, per round superati (regolamento p. 3, «Metagame»).
   var GRADI = [
     { da: 10, nome: 'Ultra Mega Uber Giga-Dweeb' }, { da: 7, nome: 'Dweeb ufficiale' },
     { da: 5, nome: 'Piccolo Dweeb' }, { da: 3, nome: 'Cibo per gatti' }
@@ -195,7 +195,8 @@
     if (j.ranghi.length === 1) return nomeValore(j.ranghi[0]);
     if (j.ranghi.length === 2) return nomeValore(j.ranghi[0]) + ' o ' + nomeValore(j.ranghi[1]);
     if (j.semi.length === 1) return 'una carta di ' + NOME_SEME[j.semi[0]];
-    return 'la carta che serve';
+    if (j.ranghi.length < 12) return j.ranghi.slice(0, -1).map(nomeValore).join(', ') + ' o ' + nomeValore(j.ranghi[j.ranghi.length - 1]);
+    return 'qualsiasi carta';
   }
 
   /*
@@ -216,7 +217,7 @@
     if (conJolly && !stato.jolly) return no('Non hai nessun jolly da parte');
     var totale = carte.length + (conJolly ? 1 : 0);
     if (!totale) return no('Scegli almeno una carta da giocare', true);
-    if (totale > MAX_CARTE) return no('Al massimo ' + MAX_CARTE + ' carte per giocata');
+    if (totale > MAX_CARTE) return no('Al massimo ' + MAX_CARTE + ' carte per giocata' + (conJolly ? ', jolly compreso' : ''));
     var v = valuta(carte, !!conJolly);
     var finali = v.punti * (stato.doppio ? 2 : 1);
     return { ok: true, perche: null, id: v.id, nome: v.nome, punti: v.punti, finali: finali, doppio: !!stato.doppio, jolly: v.jolly, fanno: v.fanno };

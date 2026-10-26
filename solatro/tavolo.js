@@ -68,7 +68,7 @@
   function tastiTesta() {
     var t = [bottone('Come si gioca', 'mini', apriRegole)];
     if (tutorial && T && T.attivo()) t.push(bottone('Salta', 'mini', function () { T.ferma(); tutorial = false; render(); }, null, 'Salta'));
-    else t.push(bottone(ricomincia ? 'Tocca ancora: perdi la partita' : 'Nuova partita', 'mini' + (ricomincia ? ' attesa' : ''), function () {
+    else t.push(bottone(ricomincia ? 'Tocca ancora: lasci la partita' : 'Nuova partita', 'mini' + (ricomincia ? ' attesa' : ''), function () {
       if (!ricomincia) { ricomincia = true; render(); return; }
       schermo = 'domanda'; render();
     }));
@@ -109,18 +109,16 @@
   }
   function messaggioRound(u, st) { return eventiJolly(u && u.eventi); }
   function riassuntoGiocata(u) {
-    var t = u.nome + ': ' + conTesto(u.punti, 'punto', 'punti') + '.';
-    if (u.usoJolly) t += ' Il jolly faceva da ' + S.dicoJolly(u.jolly) + '.';
-    if (u.doppio) t += ' Punteggio doppio.';
+    var t = u.nome + ': ' + conTesto(u.punti, 'punto', 'punti') + (u.usoJolly && u.doppio ? ', col jolly e col Doppio punteggio' : u.usoJolly ? ', col jolly' : u.doppio ? ', col Doppio punteggio' : '') + '.';
     return (t + ' ' + eventiJolly(u.eventi)).trim();
   }
   var EFFETTO_UI = {
-    'carta-extra': { prima: 'Una carta in più in mano per il resto del round: arriva alla prossima pescata.', dopo: function (st) { return 'Carta extra: dalla prossima pescata la mano sale a ' + st.manoMax + ' carte.'; } },
-    'scarto-extra': { prima: 'Uno scarto in più in questo round.', dopo: function (st) { return 'Scarto extra: scarti rimasti ' + st.scartiRimasti + '.'; } },
-    'punti-in-tasca': { prima: '25 punti in più al totale di questo round.', dopo: function (st) { return 'Punti in tasca: il round sale a ' + st.punti + ' punti.'; } },
-    'giocata-extra': { prima: 'Una giocata in più in questo round.', dopo: function (st) { return 'Giocata extra: giocate rimaste ' + st.giocate + '.'; } },
-    'doppio': { prima: 'Raddoppia i punti della prossima giocata.', dopo: function () { return 'Doppio punteggio armato: vale per la prossima giocata.'; } },
-    'scudo': { prima: 'Scatta da solo: se manchi un traguardo passi lo stesso.', dopo: null }
+    'carta-extra': { prima: 'una carta in più in mano per il resto del round: arriva alla prossima pescata.', dopo: function (st) { return 'Carta extra: dalla prossima pescata la mano sale a ' + st.manoMax + ' carte.'; } },
+    'scarto-extra': { prima: 'uno scarto in più in questo round.', dopo: function (st) { return 'Scarto extra: scarti rimasti ' + st.scartiRimasti + '.'; } },
+    'punti-in-tasca': { prima: '25 punti in più al totale di questo round.', dopo: function (st) { return 'Punti in tasca: sei a ' + st.punti + ' punti.'; } },
+    'giocata-extra': { prima: 'una giocata in più in questo round.', dopo: function (st) { return 'Giocata extra: giocate rimaste ' + st.giocate + '.'; } },
+    'doppio': { prima: 'raddoppia i punti della prossima giocata.', dopo: function () { return 'Doppio punteggio: la prossima giocata vale doppio.'; } },
+    'scudo': { prima: 'scatta da solo: se manchi un traguardo passi lo stesso.', dopo: null }
   };
 
   // ---------- il tutorial: chiede il permesso prima di ogni gesto ----------
@@ -185,9 +183,9 @@
     var prima = A ? A.prima(app, sel.carte) : null, mano0 = g.mano.map(function (c) { return c.id; });
     var n = esegui({ t: 'scarta', carte: sel.carte.slice() });
     if (n.rifiuto) return;
-    var k = g.ultimo.carte.length;
+    var k = g.ultimo.carte.length, entrate = g.mano.length - (mano0.length - k);
     togliSelezione(); bonusAperto = null; msgOk = true;
-    msg = ('Scartate ' + k + ', pescate ' + k + '. ' + eventiJolly(g.ultimo.eventi)).trim();
+    msg = ('Scartate ' + k + ', pescate ' + entrate + '. ' + eventiJolly(g.ultimo.eventi)).trim();
     if (A && !A.ridotto) { manoPrima = mano0; pesca = 'dopo-scarto'; A.prenota(); }
     fatto({ tipo: 'scarta' }); render(); pesca = ''; manoPrima = [];
     if (A) A.scarto(app, prima);
@@ -264,7 +262,7 @@
       var c = bottone(b.nome, 'chip gettone' + (bonusAperto === b.id ? ' aperto' : ''), function () { apriBonus(b.id); }, null, b.nome);
       c.setAttribute('data-bonus', b.id); r.appendChild(c);
     });
-    if (g.doppio) r.appendChild(el('span', 'chip doppio', '×2 armato'));
+    if (g.doppio) r.appendChild(el('span', 'chip doppio', '×2 sulla prossima'));
     app.appendChild(r);
     if (bonusAperto && g.bonus[bonusAperto]) {
       var b = S.BONUS_PER_ID[bonusAperto], info = el('div', 'info');
@@ -318,7 +316,7 @@
     } else {
       var gioca;
       if (l.ok) gioca = bottone('Gioca: ' + l.nome + ', ' + conTesto(l.finali, 'punto', 'punti'), 'gioca conferma', giocaScelta,
-        ((sel.jolly ? 'il jolly fa da ' + S.dicoJolly(l.jolly) : '') + (l.doppio ? (sel.jolly ? ' · ' : '') + '×2 punteggio doppio' : '')) || null, 'Gioca');
+        ((sel.jolly ? 'il jolly fa da ' + S.dicoJolly(l.jolly) : '') + (l.doppio ? (sel.jolly ? ' · ' : '') + 'doppio: ' + l.punti + ' × 2' : '')) || null, 'Gioca');
       else gioca = bottone(l.vuota ? 'Scegli le carte' : l.perche, 'gioca spenta', giocaScelta, null, 'Gioca');
       if (!l.ok) gioca.setAttribute('data-motivo', '1');
       az.appendChild(gioca);
@@ -397,12 +395,12 @@
     for (var k = 0; k < f.superati; k++) mon.appendChild(el('i'));
     mon.appendChild(el('i', 'persa'));
     p.appendChild(mon);
-    p.appendChild(el('div', 'dettaglio', 'Round ' + e.round + ': ' + e.totale + ' su ' + e.traguardo + '.'));
+    p.appendChild(el('div', 'dettaglio', 'Round ' + e.round + ': ' + e.totale + ' su ' + e.traguardo + '. Round superati: ' + f.superati + '.'));
     p.appendChild(el('p', 'round', String(f.round)));
     p.appendChild(el('div', 'grado' + (f.grado ? '' : ' nessuno'), f.grado || 'ancora nessun grado'));
     var scala = el('ol', 'scala');
     S.GRADI.slice().reverse().forEach(function (gr, i, arr) {
-      var li = el('li'); li.appendChild(el('span', null, gr.nome)); li.appendChild(el('span', 'da', gr.da + (i === arr.length - 1 ? '+' : '') + ' round'));
+      var li = el('li'); li.appendChild(el('span', null, gr.nome)); li.appendChild(el('span', 'da', gr.da + (i === arr.length - 1 ? '+' : '') + ' superati'));
       if (f.grado === gr.nome) li.className = 'raggiunto';
       else if (f.superati < gr.da && (i === 0 || f.superati >= arr[i - 1].da)) li.className = 'prossimo';
       scala.appendChild(li);
