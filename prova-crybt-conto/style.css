@@ -1,0 +1,53 @@
+/* CRYBT — prova del conto. Provvisorio: telefono in verticale, 375 px. Solo font di sistema. */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: #1d1a24; color: #f1ece2; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+body { display: flex; justify-content: center; }
+#app { width: 100%; max-width: 420px; padding: 10px 12px 18px; }
+h1 { font-size: 15px; letter-spacing: .12em; margin: 0 0 8px; color: #b9a8d8; font-weight: 700; display: flex; justify-content: space-between; align-items: baseline; }
+h1 small { font-size: 11px; letter-spacing: 0; color: #7d7690; font-weight: 400; }
+
+.mostro { display: flex; align-items: center; gap: 12px; background: #2a2533; border-radius: 12px; padding: 8px 12px; margin-bottom: 10px; }
+.mostro .carta { width: 44px; height: 62px; font-size: 15px; flex: none; }
+.mostro .carta .grande { font-size: 22px; }
+.mostro .testo { font-size: 14px; line-height: 1.3; color: #cfc7de; }
+.mostro .testo b { display: block; font-size: 22px; color: #ff9a8a; }
+
+.mano { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 4px; }
+.carta { position: relative; background: #fbf8f0; color: #1b1b1b; border-radius: 8px; border: 3px solid transparent; font-family: inherit;
+  aspect-ratio: 5 / 7; padding: 0; font-weight: 700; font-size: 20px; box-shadow: 0 2px 0 #0006; cursor: pointer; }
+.carta.rosso { color: #c4262e; }
+.carta .ang { position: absolute; top: 3px; left: 5px; line-height: 1; text-align: center; font-size: 21px; }
+.carta .ang i { display: block; font-style: normal; font-size: 14px; }
+.carta .grande { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 34px; padding-top: 14px; }
+.carta.scelta { border-color: #ffd34d; transform: translateY(-8px); box-shadow: 0 6px 0 #0006; }
+.carta.evid { border-color: #ff5a4a; transform: translateY(-8px); box-shadow: 0 0 0 3px #ff5a4a55; }
+.carta:disabled { cursor: default; opacity: 1; }
+.eroe { display: block; text-align: center; font-size: 10px; letter-spacing: .08em; color: #ffd34d; height: 14px; line-height: 14px; }
+.etichette { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px; }
+
+.tipi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+.tipi button { min-height: 48px; border: 0; border-radius: 10px; background: #5b4a8a; color: #fff; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; }
+.tipi button:active { background: #7863b0; }
+.msg { min-height: 36px; font-size: 15px; line-height: 1.25; color: #ffb4a8; margin-bottom: 6px; display: flex; align-items: center; }
+.msg.ok { color: #9be3a6; }
+.msg.neutro { color: #9a93ad; }
+
+.conto { background: #2a2533; border-radius: 12px; padding: 8px 10px; margin-bottom: 10px; min-height: 96px; }
+.conto .riga { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.conto .riga span { font-size: 12px; color: #9a93ad; letter-spacing: .06em; }
+.conto .riga b { font-size: 34px; line-height: 1; color: #ffd34d; }
+.fiches { display: flex; flex-wrap: wrap; gap: 5px; }
+.fiche { background: #3d3550; border-radius: 14px; padding: 3px 10px; font-size: 14px; border: 0; color: #f1ece2; font-family: inherit; }
+.fiche.mostro-prende { background: #6b2a2a; color: #ffd2cb; }
+button.fiche { cursor: pointer; }
+.prende { flex-basis: 100%; font-size: 11px; letter-spacing: .08em; color: #ff9a8a; margin-top: 4px; }
+
+.grosso { width: 100%; min-height: 54px; border: 0; border-radius: 12px; background: #e3a72f; color: #1d1a24; font-size: 18px; font-weight: 800; font-family: inherit; cursor: pointer; }
+.grosso.sec { background: #3d3550; color: #f1ece2; font-weight: 700; }
+.coppia-tasti { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.esito { border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; font-size: 16px; line-height: 1.35; }
+.esito.vinto { background: #1f4630; }
+.esito.perso { background: #55262a; }
+.esito b { font-size: 20px; display: block; margin-bottom: 2px; }
+.esito small { display: block; color: #d6cfe4; font-size: 13px; margin-top: 4px; }
