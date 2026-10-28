@@ -51,8 +51,11 @@ h2 { margin: 6px 0; font-size: 1.2rem; }
 .ventaglio .carta.H { color: var(--cuori); }
 .ventaglio .carta.D { color: var(--quadri); }
 .ventaglio .carta.C { color: var(--fiori); }
-.ventaglio .carta .v { font-size: 1.3rem; font-size: 22cqw; letter-spacing: -.04em; }
-.ventaglio .carta .s { font-size: 1.1rem; font-size: 19cqw; margin-top: .06em; }
+.ventaglio .carta .v { font-size: 1.6rem; font-size: 25cqw; letter-spacing: -.06em; }
+/* il seme: piccolo, negli angoli (alto a sinistra e basso a destra), perché la vista d'insieme resti sui numeri */
+.ventaglio .carta .s { position: absolute; font-size: .8rem; font-size: 10cqw; line-height: 1; }
+.ventaglio .carta .s.alto { top: 3px; left: 3px; }
+.ventaglio .carta .s.basso { bottom: 3px; right: 3px; }
 .ventaglio .carta.evid { outline: 3px solid var(--evid); outline-offset: -3px; background: #fff3cf; }
 /* un posto vuoto: si vede dove c'è ancora spazio, e che una casella ne ha tre */
 .ventaglio .posto { flex: 0 0 calc((100% - 6px) / 3); aspect-ratio: 2 / 3; border-radius: 5px; background: var(--posto); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35); }

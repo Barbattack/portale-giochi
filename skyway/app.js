@@ -93,7 +93,8 @@
       var k = el('span', 'carta ' + c.seme + ' i' + i + (i === carte.length - 1 ? ' cima' : '') + (evidenzia && evidenzia[c.id] ? ' evid' : '') + (cade && cade[c.id] ? ' cade' : ''));
       k.setAttribute('data-id', c.id);
       k.appendChild(el('span', 'v', S.etichetta(c.valore)));
-      k.appendChild(el('span', 's', S.SIMBOLO[c.seme]));
+      k.appendChild(el('span', 's alto', S.SIMBOLO[c.seme]));
+      k.appendChild(el('span', 's basso', S.SIMBOLO[c.seme]));
       e.appendChild(k);
     });
     for (var j = carte.length; j < (posti || 0); j++) { var po = el('span', 'posto'); po.setAttribute('aria-hidden', 'true'); e.appendChild(po); }
